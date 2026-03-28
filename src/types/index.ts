@@ -11,7 +11,7 @@ export interface MiddleResult {
   middleStation: string;
   travelTimes: number[];
   origins: string[];
-  names: string[];
+  names?: string[];
 }
 
 export type Category = '카페' | '맛집' | '술집';
