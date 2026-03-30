@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import StationInput from '../components/StationInput';
 import { trackEvent } from '../utils/ga4';
 
@@ -7,9 +8,10 @@ interface Props {
   names: string[];
   onNamesChange: (names: string[]) => void;
   onSubmit: () => void;
+  loading?: boolean;
 }
 
-export default function OriginScreen({ origins, onOriginsChange, names, onNamesChange, onSubmit }: Props) {
+export default function OriginScreen({ origins, onOriginsChange, names, onNamesChange, onSubmit, loading = false }: Props) {
   const updateOrigin = (index: number, value: string) => {
     const next = [...origins];
     next[index] = value;
@@ -33,7 +35,7 @@ export default function OriginScreen({ origins, onOriginsChange, names, onNamesC
     onOriginsChange(next);
   };
 
-  const canSubmit = origins.filter((o) => o.trim().length > 0).length >= 2;
+  const canSubmit = !loading && origins.filter((o) => o.trim().length > 0).length >= 2;
 
   const handleSubmit = () => {
     trackEvent('origin_input_complete', { count: origins.filter((o) => o).length });
@@ -42,8 +44,13 @@ export default function OriginScreen({ origins, onOriginsChange, names, onNamesC
   };
 
   return (
-    <div style={{ padding: '40px 20px 24px' }}>
-      <div style={{ marginBottom: 32 }}>
+    <div style={{ padding: 'clamp(28px, 6vw, 48px) clamp(16px, 5vw, 28px) 24px' }}>
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, ease: [0.25, 0.1, 0.25, 1] }}
+        style={{ marginBottom: 32 }}
+      >
         <h1 style={{
           fontSize: 22,
           fontWeight: 700,
@@ -56,9 +63,14 @@ export default function OriginScreen({ origins, onOriginsChange, names, onNamesC
         <p style={{ fontSize: 14, color: '#888', marginTop: 8, marginBottom: 0 }}>
           2~4명의 출발역을 입력하세요
         </p>
-      </div>
+      </motion.div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.08, ease: [0.25, 0.1, 0.25, 1] }}
+        style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
+      >
         {origins.map((origin, i) => (
           <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -103,11 +115,13 @@ export default function OriginScreen({ origins, onOriginsChange, names, onNamesC
             )}
           </div>
         ))}
-      </div>
+      </motion.div>
 
       {origins.length < 4 && (
-        <button
+        <motion.button
           onClick={addOrigin}
+          whileTap={{ scale: 0.98 }}
+          transition={{ duration: 0.12 }}
           style={{
             marginTop: 12,
             width: '100%',
@@ -126,16 +140,18 @@ export default function OriginScreen({ origins, onOriginsChange, names, onNamesC
         >
           <span style={{ fontSize: 16 }}>+</span>
           출발지 추가
-        </button>
+        </motion.button>
       )}
 
-      <button
+      <motion.button
         onClick={handleSubmit}
         disabled={!canSubmit}
+        whileTap={canSubmit ? { scale: 0.98 } : {}}
+        transition={{ duration: 0.12 }}
         style={{
           marginTop: 32,
           width: '100%',
-          padding: '16px',
+          padding: '18px 16px',
           borderRadius: 10,
           border: 'none',
           background: canSubmit ? '#111' : '#e0e0e0',
@@ -146,8 +162,8 @@ export default function OriginScreen({ origins, onOriginsChange, names, onNamesC
           transition: 'background 0.15s',
         }}
       >
-        중간 지점 찾기
-      </button>
+        {loading ? '추천 계산 중...' : '중간 지점 찾기'}
+      </motion.button>
     </div>
   );
 }

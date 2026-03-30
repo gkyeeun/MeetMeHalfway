@@ -6,7 +6,8 @@ type EventName =
   | 'category_click'
   | 'place_click'
   | 'route_click'
-  | 'recalculate_click';
+  | 'recalculate_click'
+  | 'explore_click';
 
 interface EventParams {
   [key: string]: string | number | boolean | undefined;
