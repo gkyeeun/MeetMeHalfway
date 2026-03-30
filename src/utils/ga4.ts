@@ -9,7 +9,6 @@ type EventName =
   | 'recalculate_click'
   | 'explore_click'
   | 'kakaomap_click'
-  | 'kakao_share_click'
   | 'share_click';
 
 

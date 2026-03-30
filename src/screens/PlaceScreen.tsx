@@ -8,36 +8,6 @@ import KakaoMap from '../components/KakaoMap';
 import { buildGraph } from '../services/graphBuilder';
 import { SUBWAY_GRAPH } from '../data/subwayGraph';
 
-declare global { interface Window { Kakao: any } }
-
-const KAKAO_JS_KEY = import.meta.env.VITE_KAKAO_MAP_KEY as string;
-
-function ensureKakaoSDK(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    if (window.Kakao) {
-      if (!window.Kakao.isInitialized()) window.Kakao.init(KAKAO_JS_KEY);
-      resolve();
-      return;
-    }
-    if (document.querySelector('[data-kakao-sdk]')) {
-      const t = setInterval(() => {
-        if (window.Kakao) {
-          clearInterval(t);
-          if (!window.Kakao.isInitialized()) window.Kakao.init(KAKAO_JS_KEY);
-          resolve();
-        }
-      }, 50);
-      return;
-    }
-    const s = document.createElement('script');
-    s.setAttribute('data-kakao-sdk', '');
-    s.src = 'https://developers.kakao.com/sdk/js/kakao.min.js';
-    s.onload = () => { if (!window.Kakao.isInitialized()) window.Kakao.init(KAKAO_JS_KEY); resolve(); };
-    s.onerror = reject;
-    document.head.appendChild(s);
-  });
-}
-
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface Props {
@@ -144,27 +114,6 @@ function PlaceCard({
     }
   };
 
-  const handleKakaoShare = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    trackEvent('kakao_share_click', { name: place.name });
-    const url = place.placeUrl ?? window.location.href;
-    try {
-      await ensureKakaoSDK();
-      window.Kakao.Share.sendDefault({
-        objectType: 'feed',
-        content: {
-          title: place.name,
-          description: place.address ?? '',
-          ...(place.imageUrl ? { imageUrl: place.imageUrl } : {}),
-          link: { mobileWebUrl: url, webUrl: url },
-        },
-      });
-    } catch {
-      // SDK 로드 실패 시 Web Share fallback
-      navigator.clipboard.writeText(url).catch(() => null);
-    }
-  };
-
   const handleShare = async (e: React.MouseEvent) => {
     e.stopPropagation();
     trackEvent('share_click', { name: place.name });
@@ -249,23 +198,6 @@ function PlaceCard({
             >
               공유
             </motion.button>
-            {place.placeUrl && (
-              <motion.button
-                onClick={handleKakaoShare}
-                whileTap={{ scale: 0.95 }}
-                transition={{ duration: 0.1 }}
-                style={{
-                  padding: '5px 10px',
-                  border: '1px solid #FEE500',
-                  borderRadius: 6,
-                  background: '#FEE500', cursor: 'pointer',
-                  fontSize: 11, color: '#3C1E1E', fontWeight: 600,
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                카카오톡
-              </motion.button>
-            )}
             {place.placeUrl && (
               <motion.button
                 onClick={handleKakaoMap}
