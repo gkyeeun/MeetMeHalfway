@@ -82,7 +82,7 @@ function RouteRow({
 function CandidateCard({
   candidate, origins, names,
   isSelected, description,
-  onSelect, onExplore,
+  onSelect,
 }: {
   candidate: CandidateStation;
   origins: string[];
@@ -90,9 +90,7 @@ function CandidateCard({
   isSelected: boolean;
   description: string;
   onSelect: () => void;
-  onExplore: () => void;
 }) {
-  const [ctaHovered, setCtaHovered] = useState(false);
   const lineColor      = getLineColor(candidate.line);
   const isTransfer     = (SUBWAY_GRAPH.nameIndex[candidate.stationName] ?? []).length > 1;
   const displayName    = (i: number) => names?.[i]?.trim() || origins[i] || `출발지 ${i + 1}`;
@@ -230,46 +228,6 @@ function CandidateCard({
               </div>
             )}
 
-            {/* 근처 장소 탐색 */}
-            <motion.div
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.25, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}
-              style={{ marginTop: 16 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <motion.button
-                onClick={onExplore}
-                onHoverStart={() => setCtaHovered(true)}
-                onHoverEnd={() => setCtaHovered(false)}
-                whileTap={{ scale: 0.98 }}
-                animate={{
-                  background: ctaHovered ? lineColor : `${lineColor}0d`,
-                  color: ctaHovered ? '#fff' : lineColor,
-                  borderColor: ctaHovered ? lineColor : `${lineColor}55`,
-                }}
-                transition={{ duration: 0.15 }}
-                style={{
-                  width: '100%', padding: '13px 16px',
-                  border: `1px solid ${lineColor}55`,
-                  borderRadius: 10,
-                  background: `${lineColor}0d`,
-                  cursor: 'pointer',
-                  fontSize: 14, fontWeight: 600,
-                  color: lineColor,
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                }}
-              >
-                <span>근처 장소 탐색하기</span>
-                <motion.span
-                  animate={{ x: ctaHovered ? 4 : 0 }}
-                  transition={{ duration: 0.15 }}
-                  style={{ fontSize: 15, lineHeight: 1 }}
-                >
-                  →
-                </motion.span>
-              </motion.button>
-            </motion.div>
           </>
         )}
       </div>
@@ -283,53 +241,92 @@ export default function ResultScreen({ result, onExplore, onBack }: Props) {
   const { candidates, origins, names } = result;
   const [selectedId, setSelectedId] = useState(candidates[0]?.stationId ?? '');
 
+  const selectedCandidate = candidates.find((c) => c.stationId === selectedId);
+
+  const handleExplore = () => {
+    if (!selectedCandidate) return;
+    trackEvent('explore_click', { station: selectedCandidate.stationName });
+    onExplore(selectedCandidate.stationName);
+  };
+
   return (
-    <div style={{ padding: 'clamp(28px, 6vw, 48px) clamp(16px, 5vw, 28px) 48px' }}>
-      <motion.button
-        onClick={onBack}
-        whileTap={{ scale: 0.97 }}
-        transition={{ duration: 0.12 }}
-        style={{
-          border: 'none', background: 'none', cursor: 'pointer',
-          padding: 0, fontSize: 14, color: '#888', marginBottom: 28,
-          display: 'flex', alignItems: 'center', gap: 4,
-        }}
-      >
-        ← 다시 입력
-      </motion.button>
-
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45, ease: [0.25, 0.1, 0.25, 1] }}
-        style={{ marginBottom: 28 }}
-      >
-        <p style={{ fontSize: 13, color: '#aaa', margin: '0 0 4px', letterSpacing: 0.1 }}>
-          {origins.join(' · ')} 기준
-        </p>
-        <h1 style={{ fontSize: 22, fontWeight: 700, color: '#111', margin: 0, letterSpacing: -0.4 }}>
-          중간 지점 추천
-        </h1>
-      </motion.div>
-
-      {candidates.map((c, index) => (
-        <motion.div
-          key={c.stationId}
-          initial={{ opacity: 0, y: 16, scale: 0.98 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.35, delay: index * 0.07, ease: [0.25, 0.1, 0.25, 1] }}
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <div style={{ padding: 'clamp(28px, 6vw, 48px) clamp(16px, 5vw, 28px) 0', flex: 1 }}>
+        <motion.button
+          onClick={onBack}
+          whileTap={{ scale: 0.97 }}
+          transition={{ duration: 0.12 }}
+          style={{
+            border: 'none', background: 'none', cursor: 'pointer',
+            padding: 0, fontSize: 14, color: '#888', marginBottom: 28,
+            display: 'flex', alignItems: 'center', gap: 4,
+          }}
         >
-          <CandidateCard
-            candidate={c}
-            origins={origins}
-            names={names}
-            isSelected={c.stationId === selectedId}
-            description={makeDescription(c, candidates)}
-            onSelect={() => setSelectedId(c.stationId)}
-            onExplore={() => { trackEvent('explore_click', { station: c.stationName }); onExplore(c.stationName); }}
-          />
+          ← 다시 입력
+        </motion.button>
+
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease: [0.25, 0.1, 0.25, 1] }}
+          style={{ marginBottom: 28 }}
+        >
+          <p style={{ fontSize: 13, color: '#aaa', margin: '0 0 4px', letterSpacing: 0.1 }}>
+            {origins.join(' · ')} 기준
+          </p>
+          <h1 style={{ fontSize: 22, fontWeight: 700, color: '#111', margin: 0, letterSpacing: -0.4 }}>
+            중간 지점 추천
+          </h1>
         </motion.div>
-      ))}
+
+        <div style={{ paddingBottom: 100 }}>
+          {candidates.map((c, index) => (
+            <motion.div
+              key={c.stationId}
+              initial={{ opacity: 0, y: 16, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.35, delay: index * 0.07, ease: [0.25, 0.1, 0.25, 1] }}
+            >
+              <CandidateCard
+                candidate={c}
+                origins={origins}
+                names={names}
+                isSelected={c.stationId === selectedId}
+                description={makeDescription(c, candidates)}
+                onSelect={() => setSelectedId(c.stationId)}
+              />
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* 하단 fixed CTA */}
+      {selectedCandidate && (
+        <div style={{
+          position: 'fixed', bottom: 0, left: 0, right: 0,
+          background: '#fff', borderTop: '1px solid #f0f0f0',
+        }}>
+          <div style={{ maxWidth: 480, margin: '0 auto', padding: '14px clamp(16px, 5vw, 28px)' }}>
+            <motion.button
+              onClick={handleExplore}
+              whileTap={{ scale: 0.98 }}
+              transition={{ duration: 0.12 }}
+              style={{
+                width: '100%', padding: '15px',
+                borderRadius: 12,
+                border: 'none',
+                background: '#111',
+                fontSize: 15, fontWeight: 600,
+                color: '#fff', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              }}
+            >
+              <span>근처 장소 탐색하기</span>
+              <span style={{ fontSize: 16, lineHeight: 1 }}>→</span>
+            </motion.button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

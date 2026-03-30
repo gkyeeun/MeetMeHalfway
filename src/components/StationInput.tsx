@@ -43,15 +43,18 @@ function searchStations(query: string): AutocompleteItem[] {
 interface Props {
   value: string;
   onChange: (value: string) => void;
+  onConfirm?: () => void;
+  onReset?: () => void;
   placeholder?: string;
   index: number;
 }
 
-export default function StationInput({ value, onChange, placeholder, index }: Props) {
+export default function StationInput({ value, onChange, onConfirm, onReset, placeholder, index }: Props) {
   const [query,       setQuery]       = useState(value);
   const [items,       setItems]       = useState<AutocompleteItem[]>([]);
   const [open,        setOpen]        = useState(false);
   const [highlighted, setHighlighted] = useState(-1);
+  const [focused,     setFocused]     = useState(false);
 
   const inputRef  = useRef<HTMLInputElement>(null);
   const timerRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -63,17 +66,19 @@ export default function StationInput({ value, onChange, placeholder, index }: Pr
   const handleSelect = useCallback((name: string) => {
     setQuery(name);
     onChange(name);
+    onConfirm?.();
     setItems([]);
     setOpen(false);
     setHighlighted(-1);
     inputRef.current?.blur();
-  }, [onChange]);
+  }, [onChange, onConfirm]);
 
   // 입력 변경 + 디바운스 검색
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const q = e.target.value;
     setQuery(q);
     onChange(q);
+    onReset?.();
     setHighlighted(-1);
 
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -123,11 +128,12 @@ export default function StationInput({ value, onChange, placeholder, index }: Pr
         display: 'flex',
         alignItems: 'center',
         border: '1px solid',
-        borderColor: open ? '#111' : '#e0e0e0',
+        borderColor: focused ? '#4F46E5' : '#e0e0e0',
         borderRadius: 8,
         padding: '12px 14px',
         background: '#fff',
-        transition: 'border-color 0.15s',
+        transition: 'border-color 0.18s, box-shadow 0.18s',
+        boxShadow: focused ? '0 0 0 3px rgba(79,70,229,0.1)' : 'none',
       }}>
         <span style={{
           fontSize: 12, color: '#999', marginRight: 10,
@@ -141,8 +147,8 @@ export default function StationInput({ value, onChange, placeholder, index }: Pr
           value={query}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          onFocus={() => { if (query.trim() && items.length > 0) setOpen(true); }}
-          onBlur={() => setTimeout(() => setOpen(false), 150)}
+          onFocus={() => { setFocused(true); if (query.trim() && items.length > 0) setOpen(true); }}
+          onBlur={() => { setFocused(false); setTimeout(() => setOpen(false), 150); }}
           placeholder={placeholder ?? '출발역 입력'}
           autoComplete="off"
           style={{

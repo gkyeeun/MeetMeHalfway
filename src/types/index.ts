@@ -8,13 +8,15 @@ export interface MiddleResult {
 
 export interface Place {
   name: string;
-  rating: number;
+  rating?: number;
   category: string;
-  distance: string;
+  distance?: string;
   description?: string;
   imageUrl?: string;
   lat?: number;
   lng?: number;
+  address?: string;
+  placeUrl?: string;
 }
 
 export type Category = '카페' | '맛집' | '술집';
