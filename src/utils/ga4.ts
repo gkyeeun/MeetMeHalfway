@@ -7,7 +7,11 @@ type EventName =
   | 'place_click'
   | 'route_click'
   | 'recalculate_click'
-  | 'explore_click';
+  | 'explore_click'
+  | 'kakaomap_click'
+  | 'kakao_share_click'
+  | 'share_click';
+
 
 interface EventParams {
   [key: string]: string | number | boolean | undefined;
