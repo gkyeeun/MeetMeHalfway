@@ -49,7 +49,7 @@ interface Props {
   index: number;
 }
 
-export default function StationInput({ value, onChange, onConfirm, onReset, placeholder, index }: Props) {
+export default function StationInput({ value, onChange, onConfirm, onReset, placeholder }: Props) {
   const [query,       setQuery]       = useState(value);
   const [items,       setItems]       = useState<AutocompleteItem[]>([]);
   const [open,        setOpen]        = useState(false);
