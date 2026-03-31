@@ -32,19 +32,17 @@ export interface SubwayGraphData {
 
 // ─── 추천 결과 ────────────────────────────────────────────────────────────────
 export interface CandidateStation {
-  rank: number;           // 1 = 최우선 추천, 2·3 = 대안
-  stationId: string;      // "왕십리_2"
-  stationName: string;    // "왕십리"
-  line: number;           // 2
-  lineName: string;       // "2호선" | "경의중앙선"
+  rank: number;              // 1 = 최우선 추천, 2·3 = 대안
+  stationId: string;         // "왕십리_2"
+  stationName: string;       // "왕십리"
+  line: number;              // 2
+  lineName: string;          // "2호선" | "경의중앙선"
   lat: number;
   lng: number;
-  durationFromA: number;  // 출발지 A → 후보역 최단 소요시간(분)
-  durationFromB: number;  // 출발지 B → 후보역 최단 소요시간(분)
-  avgDuration: number;    // (durationFromA + durationFromB) / 2
-  score: number;          // 낮을수록 좋음
-  /** 출발지 A → 추천역 경로 요약 (출발역, 환승역, 도착역) */
-  routeFromA?: string[];
-  /** 출발지 B → 추천역 경로 요약 */
-  routeFromB?: string[];
+  durationsByOrigin: number[];   // 각 출발지 → 후보역 최단 소요시간(분) 배열
+  routesByOrigin: string[][];    // 각 출발지 → 추천역 경로 요약 배열
+  avgDuration: number;           // 전체 평균 소요시간
+  maxDuration: number;           // 최대 소요시간
+  spread: number;                // max - min (편차)
+  score: number;                 // 낮을수록 좋음
 }

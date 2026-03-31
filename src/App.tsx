@@ -14,29 +14,6 @@ const pageAnim = {
   exit:     { opacity: 0, y: -6, transition: { duration: 0.16, ease: [0.25, 0.1, 0.25, 1] as const } },
 };
 
-// ─── LoadingScreen ─────────────────────────────────────────────────────────────
-
-const spinnerCss = `
-  @keyframes spin { to { transform: rotate(360deg); } }
-`;
-
-function LoadingScreen({ message }: { message: string }) {
-  return (
-    <>
-      <style>{spinnerCss}</style>
-      <div style={{
-        width: 28, height: 28,
-        border: '2.5px solid #e8e8e8',
-        borderTopColor: '#4F46E5',
-        borderRadius: '50%',
-        animation: 'spin 0.75s linear infinite',
-      }} />
-      <p style={{ fontSize: 14, color: '#aaa', fontWeight: 400, margin: 0, letterSpacing: 0.1 }}>
-        {message}
-      </p>
-    </>
-  );
-}
 
 export default function App() {
   const [intro,               setIntro]               = useState(true);
@@ -61,6 +38,21 @@ export default function App() {
     setScreen('origin');
   };
 
+  const goToResultScreen = () => {
+    setScreen('result');
+  };
+
+  const goToIntro = () => {
+    setOrigins(['', '']);
+    setNames(['', '']);
+    setResult(null);
+    setSelectedStationName('');
+    setLoading(false);
+    setScreen('origin');
+    setIntro(true);
+    setTimeout(() => setIntro(false), 1200);
+  };
+
   const handleSubmit = () => {
     const validOrigins = origins.filter((o) => o.trim().length > 0);
     if (validOrigins.length < 2) return;
@@ -70,8 +62,7 @@ export default function App() {
     // delay lets AnimatePresence finish origin→loading transition before computation
     setTimeout(() => {
       const validNames = names.filter((_, i) => origins[i]?.trim().length > 0);
-      const [fromA, fromB] = validOrigins;
-      const candidates = findMiddleStations(fromA, fromB);
+      const candidates = findMiddleStations(validOrigins);
 
       if (candidates.length === 0) {
         setLoading(false);
@@ -131,27 +122,13 @@ export default function App() {
           </motion.div>
         )}
 
-        {!intro && loading && (
-          <motion.div
-            key="loading-result"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1, transition: { duration: 0.25 } }}
-            exit={{ opacity: 0, transition: { duration: 0.2 } }}
-            style={{
-              position: 'absolute', inset: 0,
-              display: 'flex', flexDirection: 'column',
-              alignItems: 'center', justifyContent: 'center',
-              gap: 16, background: '#fff',
-            }}
-          >
-            <LoadingScreen message="사잇길 찾는 중…" />
-          </motion.div>
-        )}
-
-{!intro && !loading && screen === 'origin' && (
+        {!intro && screen === 'origin' && (
           <motion.div key="origin" {...pageAnim}>
             <div style={{ padding: '16px 20px 0' }}>
-              <span style={{ fontSize: 13, fontWeight: 700, color: '#111', letterSpacing: -0.3 }}>
+              <span
+                onClick={goToIntro}
+                style={{ fontSize: 13, fontWeight: 700, color: '#111', letterSpacing: -0.3, cursor: 'pointer' }}
+              >
                 사잇길
               </span>
             </div>
@@ -188,7 +165,8 @@ export default function App() {
             <PlaceScreen
               stationName={selectedStationName}
               result={result}
-              onBack={resetAppState}
+              onBack={goToResultScreen}
+              onReset={resetAppState}
             />
           </motion.div>
         )}

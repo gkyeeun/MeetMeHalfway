@@ -32,13 +32,25 @@ export async function searchPlacesByStation(
 
   return docs
     .filter((d) => d.x && d.y)
-    .map((d) => ({
-      name: d.place_name,
-      category,
-      address: d.road_address_name || d.address_name,
-      lat: parseFloat(d.y),
-      lng: parseFloat(d.x),
-      placeUrl: d.place_url,
-      distance: d.distance ? `${Math.round(Number(d.distance))}m` : undefined,
-    }));
+    .map((d) => {
+      const distM = d.distance ? Number(d.distance) : undefined;
+      const distStr = distM == null
+        ? undefined
+        : distM < 1000
+          ? `${Math.round(distM)}m`
+          : `${(distM / 1000).toFixed(1)}km`;
+      const subCategory = d.category_name
+        ? d.category_name.split('>').pop()?.trim()
+        : undefined;
+      return {
+        name: d.place_name,
+        category,
+        subCategory,
+        address: d.road_address_name || d.address_name,
+        lat: parseFloat(d.y),
+        lng: parseFloat(d.x),
+        placeUrl: d.place_url,
+        distance: distStr,
+      };
+    });
 }

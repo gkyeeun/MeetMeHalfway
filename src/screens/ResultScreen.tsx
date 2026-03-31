@@ -12,16 +12,24 @@ interface Props {
   onBack: () => void;
 }
 
+// ─── 사잇길 점수 (낮은 raw score → 높은 표시 점수) ──────────────────────────────
+
+function toDisplayScore(rawScore: number, all: CandidateStation[]): number {
+  const min = Math.min(...all.map((c) => c.score));
+  const max = Math.max(...all.map((c) => c.score));
+  if (max === min) return 100;
+  return Math.max(60, Math.round(100 - ((rawScore - min) / (max - min)) * 100));
+}
+
 // ─── 카드 설명 ─────────────────────────────────────────────────────────────────
 
 function makeDescription(c: CandidateStation, all: CandidateStation[]): string {
-  const diff    = Math.abs(c.durationFromA - c.durationFromB);
-  const minDiff = Math.min(...all.map(x => Math.abs(x.durationFromA - x.durationFromB)));
-  const minAvg  = Math.min(...all.map(x => x.avgDuration));
+  const minSpread = Math.min(...all.map(x => x.spread));
+  const minAvg    = Math.min(...all.map(x => x.avgDuration));
 
-  if (diff === minDiff && diff <= 5) return '두 분의 이동시간이 가장 균형 잡혀 있어요';
-  if (c.avgDuration === minAvg)      return '전체 이동시간이 가장 짧은 후보예요';
-  return '한 분이 조금 더 빠르게 도착할 수 있는 대안이에요';
+  if (c.spread === minSpread && c.spread <= 5) return '모든 분의 이동시간이 가장 균형 잡혀 있어요';
+  if (c.avgDuration === minAvg)                return '전체 이동시간이 가장 짧은 후보예요';
+  return '누군가 조금 더 빠르게 도착할 수 있는 대안이에요';
 }
 
 // ─── 경로 한 줄 표시 ───────────────────────────────────────────────────────────
@@ -81,7 +89,7 @@ function RouteRow({
 
 function CandidateCard({
   candidate, origins, names,
-  isSelected, description,
+  isSelected, description, displayScore,
   onSelect,
 }: {
   candidate: CandidateStation;
@@ -89,9 +97,11 @@ function CandidateCard({
   names?: string[];
   isSelected: boolean;
   description: string;
+  displayScore: number;
   onSelect: () => void;
 }) {
   const lineColor      = getLineColor(candidate.line);
+  const isTop          = candidate.rank === 1;
   const isTransfer     = (SUBWAY_GRAPH.nameIndex[candidate.stationName] ?? []).length > 1;
   const displayName    = (i: number) => names?.[i]?.trim() || origins[i] || `출발지 ${i + 1}`;
 
@@ -103,8 +113,8 @@ function CandidateCard({
       transition={{ duration: 0.18, ease: [0.25, 0.1, 0.25, 1] }}
       style={{
         borderRadius: 16,
-        border: isSelected ? `1.5px solid ${lineColor}` : '1.5px solid #ebebeb',
-        background: '#fff',
+        border: isSelected ? `1.5px solid ${lineColor}` : isTop ? `1.5px solid ${lineColor}60` : '1.5px solid #ebebeb',
+        background: isTop ? `${lineColor}06` : '#fff',
         marginBottom: 12,
         cursor: 'pointer',
         overflow: 'hidden',
@@ -117,68 +127,89 @@ function CandidateCard({
       {/* 상단 컬러 바 */}
       <div style={{
         height: 4,
-        background: isSelected ? lineColor : '#f0f0f0',
+        background: isSelected ? lineColor : isTop ? `${lineColor}50` : '#f0f0f0',
         transition: 'background 0.2s',
       }} />
 
       <div style={{ padding: '16px 16px 18px' }}>
-        {/* 순위 + 역명 + 라인 배지 + 평균 시간 */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        {isTop && (
+          <div style={{ marginBottom: 8 }}>
             <span style={{
-              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-              width: 22, height: 22, borderRadius: '50%',
-              background: isSelected ? lineColor : '#e0e0e0',
-              color: isSelected ? '#fff' : '#888',
-              fontSize: 11, fontWeight: 700, flexShrink: 0,
-              transition: 'background 0.2s, color 0.2s',
+              fontSize: 10, fontWeight: 700,
+              color: lineColor,
+              background: `${lineColor}14`,
+              borderRadius: 4, padding: '2px 7px',
+              letterSpacing: 0.4,
             }}>
-              {candidate.rank}
+              추천
             </span>
-            <span style={{ fontSize: 18, fontWeight: 700, color: '#111', letterSpacing: -0.4 }}>
-              {candidate.stationName}
-            </span>
+          </div>
+        )}
+        {/* 순위 + 역명 + 라인 배지 */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+          <span style={{
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            width: 22, height: 22, borderRadius: '50%',
+            background: isSelected ? lineColor : '#e0e0e0',
+            color: isSelected ? '#fff' : '#888',
+            fontSize: 11, fontWeight: 700, flexShrink: 0,
+            transition: 'background 0.2s, color 0.2s',
+          }}>
+            {candidate.rank}
+          </span>
+          <span style={{ fontSize: 18, fontWeight: 700, color: '#111', letterSpacing: -0.4 }}>
+            {candidate.stationName}
+          </span>
+          <span style={{
+            fontSize: 11, color: '#fff',
+            background: lineColor,
+            borderRadius: 5, padding: '2px 7px', fontWeight: 600,
+          }}>
+            {candidate.lineName}
+          </span>
+          {isTransfer && (
             <span style={{
-              fontSize: 11, color: '#fff',
-              background: lineColor,
-              borderRadius: 5, padding: '2px 7px', fontWeight: 600,
+              fontSize: 10, color: '#888',
+              background: '#f0f0f0',
+              borderRadius: 4, padding: '2px 6px', fontWeight: 500,
             }}>
-              {candidate.lineName}
+              환승역
             </span>
-            {isTransfer && (
-              <span style={{
-                fontSize: 10, color: '#888',
-                background: '#f0f0f0',
-                borderRadius: 4, padding: '2px 6px', fontWeight: 500,
-              }}>
-                환승역
-              </span>
-            )}
-          </div>
-          <div style={{ textAlign: 'right', flexShrink: 0 }}>
-            <span style={{ fontSize: 20, fontWeight: 700, color: '#111', letterSpacing: -0.5 }}>
-              {candidate.avgDuration}
-            </span>
-            <span style={{ fontSize: 12, color: '#aaa', marginLeft: 2 }}>분</span>
-          </div>
+          )}
         </div>
 
-        {/* 출발지별 소요시간 */}
-        <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap' }}>
-          {[0, 1].map((i) => (
-            <span key={i} style={{
-              fontSize: 12, color: '#666',
-              background: '#f6f6f6', borderRadius: 6, padding: '4px 10px',
+        {/* 이동시간 + 점수 */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 10, gap: 8 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{
+              display: 'flex', flexWrap: 'wrap', gap: '2px 0',
+              marginBottom: 4,
             }}>
-              {displayName(i)} → {i === 0 ? candidate.durationFromA : candidate.durationFromB}분
-            </span>
-          ))}
+              {candidate.durationsByOrigin.map((d, i) => (
+                <span key={i} style={{ fontSize: 13, fontWeight: 600, color: '#111', letterSpacing: -0.2, whiteSpace: 'nowrap', marginRight: 8 }}>
+                  {displayName(i)} {d}분
+                </span>
+              ))}
+            </div>
+            <p style={{ margin: 0, fontSize: 11, color: '#aaa' }}>
+              평균 {candidate.avgDuration}분 · 편차 {candidate.spread.toFixed(1)}분
+            </p>
+          </div>
+          <div style={{ textAlign: 'right', flexShrink: 0 }}>
+            <div style={{ fontSize: 10, color: '#aaa', marginBottom: 1 }}>사잇길 점수</div>
+            <div>
+              <span style={{ fontSize: 18, fontWeight: 700, color: '#111', letterSpacing: -0.5 }}>
+                {displayScore}
+              </span>
+              <span style={{ fontSize: 11, color: '#aaa', marginLeft: 2 }}>점</span>
+            </div>
+          </div>
         </div>
 
         {/* 설명 문구 */}
         <p style={{
-          margin: 0, fontSize: 12,
-          color: isSelected ? '#555' : '#bbb',
+          margin: 0, fontSize: 11,
+          color: isSelected ? '#888' : '#ccc',
           lineHeight: 1.6,
           transition: 'color 0.2s',
         }}>
@@ -194,7 +225,7 @@ function CandidateCard({
         {isSelected && (
           <>
             {/* 경로 안내 */}
-            {(candidate.routeFromA || candidate.routeFromB) && (
+            {candidate.routesByOrigin.some(r => r.length > 0) && (
               <div style={{
                 marginTop: 16,
                 paddingTop: 14,
@@ -207,23 +238,17 @@ function CandidateCard({
                 }}>
                   예상 경로
                 </p>
-                {candidate.routeFromA && candidate.routeFromA.length > 0 && (
-                  <RouteRow
-                    label={displayName(0)}
-                    route={candidate.routeFromA}
-                    duration={candidate.durationFromA}
-                    arrivalLine={candidate.lineName}
-                    arrivalColor={lineColor}
-                  />
-                )}
-                {candidate.routeFromB && candidate.routeFromB.length > 0 && (
-                  <RouteRow
-                    label={displayName(1)}
-                    route={candidate.routeFromB}
-                    duration={candidate.durationFromB}
-                    arrivalLine={candidate.lineName}
-                    arrivalColor={lineColor}
-                  />
+                {candidate.routesByOrigin.map((route, i) =>
+                  route.length > 0 && (
+                    <RouteRow
+                      key={i}
+                      label={displayName(i)}
+                      route={route}
+                      duration={candidate.durationsByOrigin[i] ?? 0}
+                      arrivalLine={candidate.lineName}
+                      arrivalColor={lineColor}
+                    />
+                  )
                 )}
               </div>
             )}
@@ -293,6 +318,7 @@ export default function ResultScreen({ result, onExplore, onBack }: Props) {
                 names={names}
                 isSelected={c.stationId === selectedId}
                 description={makeDescription(c, candidates)}
+                displayScore={toDisplayScore(c.score, candidates)}
                 onSelect={() => setSelectedId(c.stationId)}
               />
             </motion.div>

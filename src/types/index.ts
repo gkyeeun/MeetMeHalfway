@@ -10,6 +10,7 @@ export interface Place {
   name: string;
   rating?: number;
   category: string;
+  subCategory?: string;
   distance?: string;
   description?: string;
   imageUrl?: string;

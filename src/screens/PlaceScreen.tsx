@@ -14,6 +14,7 @@ interface Props {
   stationName: string;
   result: MiddleResult | null;
   onBack: () => void;
+  onReset: () => void;
 }
 
 // ─── 상수 ─────────────────────────────────────────────────────────────────────
@@ -235,26 +236,34 @@ function PlaceCard({
           </div>
         </div>
 
-        {/* 하단: 거리 · 주소 */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 5, paddingLeft: 30, flexWrap: 'wrap' }}>
-          {place.distance && (
-            <span style={{
-              fontSize: 12, color: isSelected ? accentColor : '#888',
-              fontWeight: isSelected ? 600 : 400,
-              transition: 'color 0.2s',
-            }}>
-              {place.distance}
-            </span>
-          )}
-          {place.distance && place.address && (
-            <span style={{ fontSize: 11, color: '#ddd' }}>·</span>
-          )}
-          {place.address && (
-            <span style={{ fontSize: 12, color: '#bbb', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%' }}>
+        {/* 하단: 카테고리 · 거리 */}
+        {(place.subCategory || place.distance) && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, paddingLeft: 30, marginBottom: 2 }}>
+            {place.subCategory && (
+              <span style={{ fontSize: 12, color: '#888' }}>{place.subCategory}</span>
+            )}
+            {place.subCategory && place.distance && (
+              <span style={{ fontSize: 11, color: '#ddd' }}>·</span>
+            )}
+            {place.distance && (
+              <span style={{
+                fontSize: 12, color: isSelected ? accentColor : '#888',
+                fontWeight: isSelected ? 600 : 400,
+                transition: 'color 0.2s',
+              }}>
+                {place.distance}
+              </span>
+            )}
+          </div>
+        )}
+        {/* 주소 */}
+        {place.address && (
+          <div style={{ paddingLeft: 30 }}>
+            <span style={{ fontSize: 12, color: '#bbb', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', display: 'block' }}>
               {place.address}
             </span>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* 추천 이유 */}
         {place.description && (
@@ -272,7 +281,7 @@ function PlaceCard({
 
 // ─── PlaceScreen ──────────────────────────────────────────────────────────────
 
-export default function PlaceScreen({ stationName, result, onBack }: Props) {
+export default function PlaceScreen({ stationName, result, onBack, onReset }: Props) {
   const [category,      setCategory]      = useState<Category>('카페');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [rawPlaces,     setRawPlaces]     = useState<Place[]>([]);
@@ -285,7 +294,7 @@ export default function PlaceScreen({ stationName, result, onBack }: Props) {
   const originCoords = getOriginCoords(result);
   const places = sortPlaces(rawPlaces, sortKey, originCoords);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const mapRef = useRef<HTMLDivElement | null>(null);
+  const listRef  = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     abortRef.current?.abort();
@@ -321,12 +330,10 @@ export default function PlaceScreen({ stationName, result, onBack }: Props) {
     trackEvent('place_click', { name: places[i]?.name, category });
     if (scroll) {
       const card = cardRefs.current[i];
-      const map  = mapRef.current;
-      if (card && map) {
-        const mapBottom  = map.getBoundingClientRect().bottom;
-        const cardTop    = card.getBoundingClientRect().top;
-        const offset     = cardTop - mapBottom - 8;
-        window.scrollBy({ top: offset, behavior: 'smooth' });
+      const list = listRef.current;
+      if (card && list) {
+        const top = card.getBoundingClientRect().top - list.getBoundingClientRect().top + list.scrollTop - 8;
+        list.scrollTo({ top, behavior: 'smooth' });
       }
     }
   };
@@ -355,10 +362,10 @@ export default function PlaceScreen({ stationName, result, onBack }: Props) {
   );
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
 
       {/* 헤더 */}
-      <div style={{ padding: 'clamp(28px, 6vw, 48px) clamp(16px, 5vw, 28px) 0' }}>
+      <div style={{ flexShrink: 0, padding: 'clamp(28px, 6vw, 48px) clamp(16px, 5vw, 28px) 0' }}>
         <motion.button
           onClick={onBack}
           whileTap={{ scale: 0.97 }}
@@ -412,10 +419,8 @@ export default function PlaceScreen({ stationName, result, onBack }: Props) {
         </div>
       </div>
 
-      {/* 콘텐츠 */}
-      <div style={{ flex: 1, padding: '16px clamp(16px, 5vw, 28px) 90px' }}>
-
-        {/* 에러 배너 */}
+      {/* 지도 + 정렬바 — 고정 영역 */}
+      <div style={{ flexShrink: 0, padding: '12px clamp(16px, 5vw, 28px) 0' }}>
         {error && (
           <div style={{
             marginBottom: 12, padding: '10px 14px',
@@ -425,9 +430,6 @@ export default function PlaceScreen({ stationName, result, onBack }: Props) {
             {error}
           </div>
         )}
-
-        {/* 지도 */}
-        <div ref={mapRef}>
         <KakaoMap
           places={places}
           selectedIndex={selectedIndex}
@@ -435,11 +437,8 @@ export default function PlaceScreen({ stationName, result, onBack }: Props) {
           accentColor={accentColor}
           height="clamp(150px, 36vw, 196px)"
         />
-        </div>
-
-        {/* 정렬 바 */}
         {places.length > 0 && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 10 }}>
             <span style={{ fontSize: 12, color: '#bbb', marginRight: 2 }}>정렬</span>
             {(['recommend', 'distance'] as SortKey[]).map((key) => {
               const label = key === 'recommend' ? '추천순' : '가까운순';
@@ -465,8 +464,13 @@ export default function PlaceScreen({ stationName, result, onBack }: Props) {
             })}
           </div>
         )}
+      </div>
 
-        {/* 장소 카드 목록 */}
+      {/* 카드 리스트 — 독립 스크롤 영역 */}
+      <div
+        ref={listRef}
+        style={{ flex: 1, overflowY: 'auto', padding: '10px clamp(16px, 5vw, 28px) 90px' }}
+      >
         {places.length === 0 ? (
           <div style={{ paddingTop: 60, textAlign: 'center', color: '#bbb', fontSize: 14 }}>
             주변 장소 정보가 없습니다
@@ -499,7 +503,7 @@ export default function PlaceScreen({ stationName, result, onBack }: Props) {
       }}>
         <div style={{ maxWidth: 480, margin: '0 auto', padding: '14px clamp(16px, 5vw, 28px)' }}>
           <motion.button
-            onClick={onBack}
+            onClick={onReset}
             whileTap={{ scale: 0.98 }}
             transition={{ duration: 0.12 }}
             style={{

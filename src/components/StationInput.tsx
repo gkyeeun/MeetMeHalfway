@@ -128,20 +128,13 @@ export default function StationInput({ value, onChange, onConfirm, onReset, plac
         display: 'flex',
         alignItems: 'center',
         border: '1px solid',
-        borderColor: focused ? '#4F46E5' : '#e0e0e0',
+        borderColor: focused ? '#000' : '#e0e0e0',
         borderRadius: 8,
         padding: '12px 14px',
         background: '#fff',
-        transition: 'border-color 0.18s, box-shadow 0.18s',
-        boxShadow: focused ? '0 0 0 3px rgba(79,70,229,0.1)' : 'none',
+        transition: 'border-color 0.18s',
+        boxShadow: 'none',
       }}>
-        <span style={{
-          fontSize: 12, color: '#999', marginRight: 10,
-          minWidth: 16, textAlign: 'center',
-        }}>
-          {index + 1}
-        </span>
-
         <input
           ref={inputRef}
           value={query}

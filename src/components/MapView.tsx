@@ -70,8 +70,9 @@ export default function MapView({ candidates, origins, names }: Props) {
             <Popup>
               <div style={{ fontSize: 13, lineHeight: 1.6 }}>
                 <strong>{c.rank}위 — {c.stationName}</strong> ({c.lineName})<br />
-                {displayName(0)} → {c.durationFromA}분<br />
-                {displayName(1)} → {c.durationFromB}분<br />
+                {c.durationsByOrigin.map((d, i) => (
+                  <span key={i}>{displayName(i)} → {d}분<br /></span>
+                ))}
                 평균 {c.avgDuration}분
               </div>
             </Popup>
