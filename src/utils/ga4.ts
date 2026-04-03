@@ -1,20 +1,13 @@
 // GA4 event tracking (ready structure — swap in actual gtag when deploying)
 type EventName =
-  | 'origin_input_complete'
   | 'origin_complete'
-  | 'calculate_middle_click'
   | 'calculate_middle'
-  | 'middle_result_view'
   | 'result_select'
-  | 'category_click'
-  | 'place_click'
   | 'place_select'
   | 'route_click'
-  | 'recalculate_click'
-  | 'explore_click'
-  | 'kakaomap_click'
   | 'map_click'
-  | 'share_click';
+  | 'share_click'
+  | 'category_click';
 
 
 interface EventParams {

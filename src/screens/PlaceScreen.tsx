@@ -106,8 +106,7 @@ function PlaceCard({
 
   const handleKakaoMap = (e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log('Firing event: kakaomap_click / map_click', { name: place.name });
-    trackEvent('kakaomap_click', { name: place.name });
+    console.log('Firing event: map_click', { name: place.name });
     trackEvent('map_click', { name: place.name });
     if (place.placeUrl) {
       window.open(place.placeUrl, '_blank', 'noopener noreferrer');
@@ -330,8 +329,7 @@ export default function PlaceScreen({ stationName, result, onBack, onReset }: Pr
 
   const handleCardClick = (i: number, scroll = false) => {
     setSelectedIndex(i);
-    console.log('Firing event: place_click / place_select', { name: places[i]?.name, category, index: i });
-    trackEvent('place_click', { name: places[i]?.name, category });
+    console.log('Firing event: place_select', { name: places[i]?.name, category, index: i });
     trackEvent('place_select', { name: places[i]?.name, category, index: i });
     if (scroll) {
       const card = cardRefs.current[i];

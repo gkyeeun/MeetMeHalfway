@@ -273,8 +273,6 @@ export default function ResultScreen({ result, onExplore, onBack }: Props) {
 
   const handleExplore = () => {
     if (!selectedCandidate) return;
-    console.log('Firing event: explore_click', { station: selectedCandidate.stationName });
-    trackEvent('explore_click', { station: selectedCandidate.stationName });
     onExplore(selectedCandidate.stationName);
   };
 
