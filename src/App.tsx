@@ -30,6 +30,12 @@ export default function App() {
     return () => clearTimeout(t);
   }, []);
 
+  useEffect(() => {
+    const gtag = (window as unknown as { gtag?: Function }).gtag;
+    if (!gtag) return;
+    gtag('config', 'G-R77MWE8VM7');
+  }, []);
+
   const resetAppState = () => {
     setOrigins(['', '']);
     setNames(['', '']);
