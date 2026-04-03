@@ -29,3 +29,11 @@ export function trackEvent(name: EventName, params?: EventParams): void {
     console.log('[GA4]', name, params);
   }
 }
+
+export function trackPageView(page_title: string, page_path: string): void {
+  if (typeof window !== 'undefined' && (window as unknown as { gtag?: Function }).gtag) {
+    (window as unknown as { gtag: Function }).gtag('event', 'page_view', { page_title, page_path });
+  } else {
+    console.log('[GA4] page_view', { page_title, page_path });
+  }
+}

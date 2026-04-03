@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import StationInput from '../components/StationInput';
-import { trackEvent } from '../utils/ga4';
+import { trackEvent, trackPageView } from '../utils/ga4';
 import { color, input as inputStyle, button as buttonStyle, card as cardStyle } from '../tokens';
 
 interface Props {
@@ -17,6 +17,8 @@ interface Props {
 export default function OriginScreen({ origins, onOriginsChange, names, onNamesChange, onSubmit, loading = false }: Props) {
   const [focusedNameIdx,   setFocusedNameIdx]   = useState<number | null>(null);
   const [confirmedOrigins, setConfirmedOrigins] = useState<boolean[]>(() => origins.map(() => false));
+
+  useEffect(() => { trackPageView('Origin', '/origin'); }, []);
 
   const updateOrigin = (index: number, value: string) => {
     const next = [...origins];

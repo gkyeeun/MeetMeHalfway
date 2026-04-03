@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import type { MiddleResult } from '../types';
 import type { CandidateStation } from '../types/subway';
 import { getLineColor } from '../utils/lineColors';
 import { SUBWAY_GRAPH } from '../data/subwayGraph';
-import { trackEvent } from '../utils/ga4';
+import { trackEvent, trackPageView } from '../utils/ga4';
 import { color, button as buttonStyle } from '../tokens';
 
 interface Props {
@@ -266,6 +266,8 @@ function CandidateCard({
 export default function ResultScreen({ result, onExplore, onBack }: Props) {
   const { candidates, origins, names } = result;
   const [selectedId, setSelectedId] = useState(candidates[0]?.stationId ?? '');
+
+  useEffect(() => { trackPageView('Result', '/result'); }, []);
 
   const selectedCandidate = candidates.find((c) => c.stationId === selectedId);
 

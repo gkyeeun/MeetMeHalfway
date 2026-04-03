@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import type { Place, Category, MiddleResult } from '../types';
 import { searchPlacesByStation } from '../services/kakaoLocal';
 import { getPlacesByStation } from '../data/places';
-import { trackEvent } from '../utils/ga4';
+import { trackEvent, trackPageView } from '../utils/ga4';
 import KakaoMap from '../components/KakaoMap';
 import { buildGraph } from '../services/graphBuilder';
 import { SUBWAY_GRAPH } from '../data/subwayGraph';
@@ -289,6 +289,8 @@ export default function PlaceScreen({ stationName, result, onBack, onReset }: Pr
 
   const accentColor = color.accent;
   const originCoords = getOriginCoords(result);
+
+  useEffect(() => { trackPageView('Place', '/place'); }, []);
   const places = sortPlaces(rawPlaces, sortKey, originCoords);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const listRef  = useRef<HTMLDivElement | null>(null);
