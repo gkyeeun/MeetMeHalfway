@@ -137,7 +137,7 @@ export default function StationInput({ value, onChange, onConfirm, onReset, plac
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           onFocus={() => { setFocused(true); if (query.trim() && items.length > 0) setOpen(true); }}
-          onBlur={() => { setFocused(false); setTimeout(() => setOpen(false), 150); }}
+          onBlur={() => { setFocused(false); setTimeout(() => setOpen(false), 300); }}
           placeholder={placeholder ?? '출발역 입력'}
           autoComplete="off"
           style={inputStyle.field}
@@ -146,6 +146,7 @@ export default function StationInput({ value, onChange, onConfirm, onReset, plac
         {query && (
           <button
             onMouseDown={handleClear}
+            onTouchEnd={handleClear}
             style={{
               border: 'none', background: 'none', cursor: 'pointer',
               padding: 0, color: '#bbb', fontSize: 16, lineHeight: 1,
@@ -174,7 +175,8 @@ export default function StationInput({ value, onChange, onConfirm, onReset, plac
             return (
               <button
                 key={item.name}
-                onMouseDown={() => handleSelect(item.name)}
+                onMouseDown={(e) => { e.preventDefault(); handleSelect(item.name); }}
+                onTouchEnd={(e) => { e.preventDefault(); handleSelect(item.name); }}
                 onMouseEnter={() => setHighlighted(i)}
                 onMouseLeave={() => setHighlighted(-1)}
                 style={{
