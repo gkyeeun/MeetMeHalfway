@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { GRAPH } from '../services/graphBuilder';
 import { SUBWAY_GRAPH } from '../data/subwayGraph';
-import { color, radius, fontSize, fontWeight, shadow, input as inputStyle } from '../tokens';
+import { color, radius, shadow, input as inputStyle } from '../tokens';
 
 // ─── 모듈 로드 시 한 번만 계산 ───────────────────────────────────────────────
 
