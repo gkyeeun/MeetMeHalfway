@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { GRAPH } from '../services/graphBuilder';
 import { SUBWAY_GRAPH } from '../data/subwayGraph';
+import { color, radius, fontSize, fontWeight, shadow, input as inputStyle } from '../tokens';
 
 // ─── 모듈 로드 시 한 번만 계산 ───────────────────────────────────────────────
 
@@ -19,7 +20,8 @@ interface AutocompleteItem {
 // ─── 검색 함수 ────────────────────────────────────────────────────────────────
 
 function searchStations(query: string): AutocompleteItem[] {
-  const q = query.trim();
+  // strip trailing 역 so "강남역" matches data entry "강남"
+  const q = query.trim().replace(/역$/, '');
   if (!q) return [];
 
   // 앞글자 일치 우선, 포함 일치 후순위
@@ -34,7 +36,8 @@ function searchStations(query: string): AutocompleteItem[] {
     for (const n of nodes) {
       if (!seen.has(n.line)) { seen.add(n.line); labels.push(n.lineName); }
     }
-    return { name, displayLines: labels.join('·') };
+    // always expose the full "역"-suffixed name to callers
+    return { name: name + '역', displayLines: labels.join('·') };
   });
 }
 
@@ -124,17 +127,7 @@ export default function StationInput({ value, onChange, onConfirm, onReset, plac
   return (
     <div style={{ position: 'relative' }}>
       {/* ── 입력 박스 ──────────────────────────────────────────────────────── */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        border: '1px solid',
-        borderColor: focused ? '#000' : '#e0e0e0',
-        borderRadius: 8,
-        padding: '12px 14px',
-        background: '#fff',
-        transition: 'border-color 0.18s',
-        boxShadow: 'none',
-      }}>
+      <div style={inputStyle.wrapper(focused)}>
         <input
           ref={inputRef}
           value={query}
@@ -144,11 +137,7 @@ export default function StationInput({ value, onChange, onConfirm, onReset, plac
           onBlur={() => { setFocused(false); setTimeout(() => setOpen(false), 150); }}
           placeholder={placeholder ?? '출발역 입력'}
           autoComplete="off"
-          style={{
-            border: 'none', outline: 'none',
-            fontSize: 15, flex: 1,
-            background: 'transparent', color: '#111',
-          }}
+          style={inputStyle.field}
         />
 
         {query && (
@@ -169,11 +158,11 @@ export default function StationInput({ value, onChange, onConfirm, onReset, plac
         <div style={{
           position: 'absolute',
           top: '100%', left: 0, right: 0,
-          background: '#fff',
-          border: '1px solid #e0e0e0',
-          borderRadius: 8,
+          background: color.white,
+          border: `1px solid ${color.border}`,
+          borderRadius: radius.md,
           marginTop: 4,
-          boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+          boxShadow: shadow.dropdown,
           zIndex: 100,
           overflow: 'hidden',
         }}>
@@ -193,7 +182,7 @@ export default function StationInput({ value, onChange, onConfirm, onReset, plac
                   padding: '11px 14px',
                   border: 'none',
                   borderBottom: '1px solid #f5f5f5',
-                  background: isHighlighted ? '#f5f5f5' : '#fff',
+                  background: isHighlighted ? color.bgHighlight : color.white,
                   cursor: 'pointer',
                   textAlign: 'left',
                 }}
@@ -211,8 +200,8 @@ export default function StationInput({ value, onChange, onConfirm, onReset, plac
                 <span style={{
                   fontSize: 11,
                   color: '#666',
-                  background: isHighlighted ? '#e8e8e8' : '#f0f0f0',
-                  borderRadius: 4,
+                  background: isHighlighted ? color.borderCard : color.divider,
+                  borderRadius: 6,
                   padding: '2px 7px',
                   fontWeight: 500,
                   whiteSpace: 'nowrap',

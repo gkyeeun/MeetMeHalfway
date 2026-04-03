@@ -60,7 +60,7 @@ export function buildGraph(data: SubwayGraphData): SubwayGraph {
   return {
     getStation: (id) => stationMap.get(id),
     getNeighbors: (id) => adj.get(id) ?? [],
-    findByName: (name) => nameMap.get(name) ?? [],
+    findByName: (name) => nameMap.get(name.replace(/역$/, '')) ?? [],
     stations: data.stations,
     stationCount: stationMap.size,
     edgeCount: data.edges.length,

@@ -52,7 +52,7 @@ export default function MapView({ candidates, origins, names }: Props) {
   const displayName = (i: number) => names?.[i]?.trim() || origins[i] || `출발지 ${i + 1}`;
 
   return (
-    <div style={{ height: 220, borderRadius: 12, overflow: 'hidden', marginBottom: 20 }}>
+    <div style={{ height: 220, borderRadius: 10, overflow: 'hidden', marginBottom: 20 }}>
       <MapContainer
         key={candidates.map(c => c.stationId).join(',')}
         center={[candidates[0].lat, candidates[0].lng]}

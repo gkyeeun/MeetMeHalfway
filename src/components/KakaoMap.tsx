@@ -183,7 +183,7 @@ export default function KakaoMap({ places, selectedIndex, onMarkerClick, accentC
 
   const wrapStyle: React.CSSProperties = {
     height: height ?? 'clamp(180px, 45vw, 240px)',
-    borderRadius: 16,
+    borderRadius: 14,
     overflow: 'hidden',
     marginBottom: 20,
   };

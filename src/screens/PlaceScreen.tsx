@@ -7,6 +7,7 @@ import { trackEvent } from '../utils/ga4';
 import KakaoMap from '../components/KakaoMap';
 import { buildGraph } from '../services/graphBuilder';
 import { SUBWAY_GRAPH } from '../data/subwayGraph';
+import { color, button as buttonStyle } from '../tokens';
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -21,11 +22,6 @@ interface Props {
 
 const CATEGORIES: Category[] = ['카페', '맛집', '술집'];
 
-const CATEGORY_COLOR: Record<Category, string> = {
-  카페: '#6F4E37',
-  맛집: '#D94F3D',
-  술집: '#4A3C8C',
-};
 
 type SortKey = 'recommend' | 'distance';
 
@@ -143,9 +139,9 @@ function PlaceCard({
       whileTap={{ scale: 0.99 }}
       transition={{ duration: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
       style={{
-        borderRadius: 12,
-        border: isSelected ? `1.5px solid ${accentColor}` : '1.5px solid #ebebeb',
-        background: isSelected ? `${accentColor}06` : '#fff',
+        borderRadius: 10,
+        border: isSelected ? `1.5px solid ${accentColor}` : `1px solid ${color.border}`,
+        background: '#fff',
         marginBottom: 8,
         cursor: 'pointer',
         boxShadow: isSelected ? `0 2px 12px ${accentColor}18` : '0 1px 3px rgba(0,0,0,0.04)',
@@ -184,21 +180,6 @@ function PlaceCard({
                 {copyMsg}
               </span>
             )}
-            <motion.button
-              onClick={handleShare}
-              whileTap={{ scale: 0.95 }}
-              transition={{ duration: 0.1 }}
-              style={{
-                padding: '5px 10px',
-                border: '1px solid #e0e0e0',
-                borderRadius: 6,
-                background: '#fff', cursor: 'pointer',
-                fontSize: 11, color: '#666', fontWeight: 500,
-                whiteSpace: 'nowrap',
-              }}
-            >
-              공유
-            </motion.button>
             {place.placeUrl && (
               <motion.button
                 onClick={handleKakaoMap}
@@ -223,16 +204,31 @@ function PlaceCard({
                 transition={{ duration: 0.1 }}
                 style={{
                   padding: '5px 10px',
-                  border: `1px solid ${accentColor}50`,
+                  border: '1px solid #e0e0e0',
                   borderRadius: 6,
                   background: '#fff', cursor: 'pointer',
-                  fontSize: 11, color: accentColor, fontWeight: 600,
+                  fontSize: 11, color: '#666', fontWeight: 500,
                   whiteSpace: 'nowrap',
                 }}
               >
                 길찾기
               </motion.button>
             )}
+            <motion.button
+              onClick={handleShare}
+              whileTap={{ scale: 0.95 }}
+              transition={{ duration: 0.1 }}
+              style={{
+                padding: '5px 10px',
+                border: '1px solid #e0e0e0',
+                borderRadius: 6,
+                background: '#fff', cursor: 'pointer',
+                fontSize: 11, color: '#666', fontWeight: 500,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              공유
+            </motion.button>
           </div>
         </div>
 
@@ -290,7 +286,7 @@ export default function PlaceScreen({ stationName, result, onBack, onReset }: Pr
   const [error,         setError]         = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
-  const accentColor = CATEGORY_COLOR[category];
+  const accentColor = color.accent;
   const originCoords = getOriginCoords(result);
   const places = sortPlaces(rawPlaces, sortKey, originCoords);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -346,18 +342,18 @@ export default function PlaceScreen({ stationName, result, onBack, onReset }: Pr
         position: 'absolute', inset: 0,
         display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
-        gap: 16, background: '#fff',
+        gap: 16, background: color.bgPage,
       }}
     >
       <style>{spinnerCss}</style>
       <div style={{
         width: 28, height: 28,
         border: '2.5px solid #e8e8e8',
-        borderTopColor: '#4F46E5',
+        borderTopColor: color.accent,
         borderRadius: '50%',
         animation: 'ps-spin 0.75s linear infinite',
       }} />
-      <p style={{ fontSize: 14, color: '#aaa', fontWeight: 400, margin: 0 }}>근처 장소 탐색 중…</p>
+      <p style={{ fontSize: 14, color: '#888', fontWeight: 400, margin: 0 }}>근처 장소 탐색 중…</p>
     </motion.div>
   );
 
@@ -370,11 +366,7 @@ export default function PlaceScreen({ stationName, result, onBack, onReset }: Pr
           onClick={onBack}
           whileTap={{ scale: 0.97 }}
           transition={{ duration: 0.12 }}
-          style={{
-            border: 'none', background: 'none', cursor: 'pointer',
-            padding: 0, fontSize: 14, color: '#888', marginBottom: 22,
-            display: 'flex', alignItems: 'center', gap: 4,
-          }}
+          style={buttonStyle.ghost}
         >
           ← 결과로 돌아가기
         </motion.button>
@@ -385,19 +377,31 @@ export default function PlaceScreen({ stationName, result, onBack, onReset }: Pr
           transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
           style={{ marginBottom: 18 }}
         >
-          <p style={{ fontSize: 13, color: '#aaa', margin: '0 0 2px', letterSpacing: 0.1 }}>
-            {stationName} 주변
-          </p>
-          <h1 style={{ fontSize: 20, fontWeight: 700, color: '#111', margin: 0, letterSpacing: -0.3 }}>
+          <span style={{
+            display: 'inline-block',
+            background: color.accent,
+            color: '#fff',
+            fontSize: 11,
+            fontWeight: 700,
+            padding: '3px 10px',
+            borderRadius: 20,
+            marginBottom: 10,
+            letterSpacing: 0.2,
+          }}>
+            place!
+          </span>
+          <h1 style={{ fontSize: 26, fontWeight: 700, color: '#111', margin: 0, lineHeight: 1.2, letterSpacing: -0.5 }}>
             어디서 만날까요?
           </h1>
+          <p style={{ fontSize: 13, color: '#888', marginTop: 6, marginBottom: 0 }}>
+            {stationName} 주변
+          </p>
         </motion.div>
 
         {/* 카테고리 탭 */}
-        <div style={{ display: 'flex', gap: 0, borderBottom: '1px solid #ebebeb' }}>
+        <div style={{ display: 'flex', gap: 0, borderBottom: `1px solid ${color.border}` }}>
           {CATEGORIES.map((cat) => {
             const active = cat === category;
-            const color  = CATEGORY_COLOR[cat];
             return (
               <button
                 key={cat}
@@ -406,8 +410,8 @@ export default function PlaceScreen({ stationName, result, onBack, onReset }: Pr
                   flex: 1, padding: '13px 0',
                   border: 'none', background: 'none', cursor: 'pointer',
                   fontSize: 14, fontWeight: active ? 700 : 400,
-                  color: active ? color : '#aaa',
-                  borderBottom: active ? `2.5px solid ${color}` : '2.5px solid transparent',
+                  color: active ? color.accent : '#aaa',
+                  borderBottom: active ? `2.5px solid ${color.accent}` : '2.5px solid transparent',
                   marginBottom: -1,
                   transition: 'all 0.15s',
                 }}
@@ -450,7 +454,7 @@ export default function PlaceScreen({ stationName, result, onBack, onReset }: Pr
                   style={{
                     padding: '4px 10px',
                     border: active ? `1px solid ${accentColor}` : '1px solid #e8e8e8',
-                    borderRadius: 20,
+                    borderRadius: 14,
                     background: active ? `${accentColor}10` : '#fff',
                     fontSize: 12, color: active ? accentColor : '#999',
                     fontWeight: active ? 600 : 400,
@@ -506,12 +510,7 @@ export default function PlaceScreen({ stationName, result, onBack, onReset }: Pr
             onClick={onReset}
             whileTap={{ scale: 0.98 }}
             transition={{ duration: 0.12 }}
-            style={{
-              width: '100%', padding: '15px',
-              borderRadius: 12, border: '1px solid #e0e0e0',
-              background: '#fff', fontSize: 15, fontWeight: 500,
-              color: '#333', cursor: 'pointer',
-            }}
+            style={buttonStyle.secondaryCta}
           >
             다시 찾기
           </motion.button>

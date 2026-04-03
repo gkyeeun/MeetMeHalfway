@@ -5,6 +5,7 @@ import type { CandidateStation } from '../types/subway';
 import { getLineColor } from '../utils/lineColors';
 import { SUBWAY_GRAPH } from '../data/subwayGraph';
 import { trackEvent } from '../utils/ga4';
+import { color, button as buttonStyle } from '../tokens';
 
 interface Props {
   result: MiddleResult;
@@ -72,7 +73,7 @@ function RouteRow({
         <span style={{
           fontSize: 10, color: arrivalColor,
           background: `${arrivalColor}18`,
-          borderRadius: 4, padding: '1px 5px',
+          borderRadius: 6, padding: '1px 5px',
           fontWeight: 600, flexShrink: 0,
         }}>
           {arrivalLine}
@@ -112,9 +113,9 @@ function CandidateCard({
       whileTap={{ scale: 0.99 }}
       transition={{ duration: 0.18, ease: [0.25, 0.1, 0.25, 1] }}
       style={{
-        borderRadius: 16,
-        border: isSelected ? `1.5px solid ${lineColor}` : isTop ? `1.5px solid ${lineColor}60` : '1.5px solid #ebebeb',
-        background: isTop ? `${lineColor}06` : '#fff',
+        borderRadius: 14,
+        border: isSelected ? `1.5px solid ${lineColor}` : isTop ? `1.5px solid ${lineColor}60` : `1px solid ${color.border}`,
+        background: '#fff',
         marginBottom: 12,
         cursor: 'pointer',
         overflow: 'hidden',
@@ -138,7 +139,7 @@ function CandidateCard({
               fontSize: 10, fontWeight: 700,
               color: lineColor,
               background: `${lineColor}14`,
-              borderRadius: 4, padding: '2px 7px',
+              borderRadius: 6, padding: '2px 7px',
               letterSpacing: 0.4,
             }}>
               추천
@@ -163,7 +164,7 @@ function CandidateCard({
           <span style={{
             fontSize: 11, color: '#fff',
             background: lineColor,
-            borderRadius: 5, padding: '2px 7px', fontWeight: 600,
+            borderRadius: 6, padding: '2px 7px', fontWeight: 600,
           }}>
             {candidate.lineName}
           </span>
@@ -171,7 +172,7 @@ function CandidateCard({
             <span style={{
               fontSize: 10, color: '#888',
               background: '#f0f0f0',
-              borderRadius: 4, padding: '2px 6px', fontWeight: 500,
+              borderRadius: 6, padding: '2px 6px', fontWeight: 500,
             }}>
               환승역
             </span>
@@ -281,11 +282,7 @@ export default function ResultScreen({ result, onExplore, onBack }: Props) {
           onClick={onBack}
           whileTap={{ scale: 0.97 }}
           transition={{ duration: 0.12 }}
-          style={{
-            border: 'none', background: 'none', cursor: 'pointer',
-            padding: 0, fontSize: 14, color: '#888', marginBottom: 28,
-            display: 'flex', alignItems: 'center', gap: 4,
-          }}
+          style={buttonStyle.ghost}
         >
           ← 다시 입력
         </motion.button>
@@ -296,12 +293,25 @@ export default function ResultScreen({ result, onExplore, onBack }: Props) {
           transition={{ duration: 0.45, ease: [0.25, 0.1, 0.25, 1] }}
           style={{ marginBottom: 28 }}
         >
-          <p style={{ fontSize: 13, color: '#aaa', margin: '0 0 4px', letterSpacing: 0.1 }}>
-            {origins.join(' · ')} 기준
-          </p>
-          <h1 style={{ fontSize: 22, fontWeight: 700, color: '#111', margin: 0, letterSpacing: -0.4 }}>
+          <span style={{
+            display: 'inline-block',
+            background: color.accent,
+            color: '#fff',
+            fontSize: 11,
+            fontWeight: 700,
+            padding: '3px 10px',
+            borderRadius: 20,
+            marginBottom: 10,
+            letterSpacing: 0.2,
+          }}>
+            result!
+          </span>
+          <h1 style={{ fontSize: 28, fontWeight: 700, color: '#111', margin: 0, lineHeight: 1.2, letterSpacing: -0.5 }}>
             중간 지점 추천
           </h1>
+          <p style={{ fontSize: 13, color: '#888', marginTop: 6, marginBottom: 0 }}>
+            {origins.join(' · ')} 기준
+          </p>
         </motion.div>
 
         <div style={{ paddingBottom: 100 }}>
@@ -337,15 +347,7 @@ export default function ResultScreen({ result, onExplore, onBack }: Props) {
               onClick={handleExplore}
               whileTap={{ scale: 0.98 }}
               transition={{ duration: 0.12 }}
-              style={{
-                width: '100%', padding: '15px',
-                borderRadius: 12,
-                border: 'none',
-                background: '#111',
-                fontSize: 15, fontWeight: 600,
-                color: '#fff', cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-              }}
+              style={buttonStyle.forwardCta}
             >
               <span>근처 장소 탐색하기</span>
               <span style={{ fontSize: 16, lineHeight: 1 }}>→</span>

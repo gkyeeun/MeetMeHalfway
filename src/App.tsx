@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import logoSrc from '../logo/logo.png';
 import OriginScreen from './screens/OriginScreen';
 import ResultScreen from './screens/ResultScreen';
 import PlaceScreen from './screens/PlaceScreen';
@@ -85,7 +86,7 @@ export default function App() {
       maxWidth: 480,
       margin: '0 auto',
       minHeight: '100vh',
-      background: '#fff',
+      background: '#FFFFFF',
       position: 'relative',
       overflow: 'hidden',
     }}>
@@ -99,37 +100,53 @@ export default function App() {
             style={{
               position: 'absolute', inset: 0,
               display: 'flex', flexDirection: 'column',
-              alignItems: 'center', justifyContent: 'center',
-              background: '#fff',
+              background: '#F9F9F9',
             }}
           >
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.55, delay: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
-              style={{ textAlign: 'center' }}
-            >
-              <p style={{ fontSize: 13, fontWeight: 700, color: '#111', letterSpacing: 1.5, margin: '0 0 12px', textTransform: 'uppercase' }}>
-                사잇길
-              </p>
-              <h1 style={{ fontSize: 28, fontWeight: 700, color: '#111', margin: '0 0 10px', letterSpacing: -0.6, lineHeight: 1.2 }}>
-                사잇길
-              </h1>
-              <p style={{ fontSize: 15, color: '#888', margin: 0, fontWeight: 400, letterSpacing: 0.1 }}>
-                둘의 사이, 만나기 좋은 길
-              </p>
-            </motion.div>
+            {/* Top nav */}
+            <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <img src={logoSrc} alt="" style={{ width: 14, height: 14 }} />
+              <span style={{ fontSize: 13, fontWeight: 700, color: '#111', letterSpacing: -0.3 }}>사잇-길</span>
+            </div>
+
+            {/* Content — left-aligned, vertically centered */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 clamp(16px, 5vw, 28px) 80px' }}>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.55, delay: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
+              >
+                {/* Logo box */}
+                <div style={{
+                  width: 56, height: 56,
+                  background: '#fff',
+                  borderRadius: 14,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  marginBottom: 20,
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                }}>
+                  <img src={logoSrc} alt="사잇-길" style={{ width: 28, height: 28 }} />
+                </div>
+                <h1 style={{ fontSize: 24, fontWeight: 700, color: '#111', margin: '0 0 8px', letterSpacing: -0.5, lineHeight: 1.2 }}>
+                  사잇-길
+                </h1>
+                <p style={{ fontSize: 15, color: '#888', margin: 0, fontWeight: 400 }}>
+                  우리 사이, 만나기 좋은 길
+                </p>
+              </motion.div>
+            </div>
           </motion.div>
         )}
 
         {!intro && screen === 'origin' && (
           <motion.div key="origin" {...pageAnim}>
-            <div style={{ padding: '16px 20px 0' }}>
+            <div style={{ padding: '16px 20px 0', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <img src={logoSrc} alt="" style={{ width: 14, height: 14, cursor: 'pointer' }} onClick={goToIntro} />
               <span
                 onClick={goToIntro}
                 style={{ fontSize: 13, fontWeight: 700, color: '#111', letterSpacing: -0.3, cursor: 'pointer' }}
               >
-                사잇길
+                사잇-길
               </span>
             </div>
             <OriginScreen

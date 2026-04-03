@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import StationInput from '../components/StationInput';
 import { trackEvent } from '../utils/ga4';
+import { color, input as inputStyle, button as buttonStyle, card as cardStyle } from '../tokens';
 
 interface Props {
   origins: string[];
@@ -67,17 +68,31 @@ export default function OriginScreen({ origins, onOriginsChange, names, onNamesC
         transition={{ duration: 0.45, ease: [0.25, 0.1, 0.25, 1] }}
         style={{ marginBottom: 32 }}
       >
+        <span style={{
+          display: 'inline-block',
+          background: color.accent,
+          color: '#fff',
+          fontSize: 11,
+          fontWeight: 700,
+          padding: '3px 10px',
+          borderRadius: 20,
+          marginBottom: 10,
+          letterSpacing: 0.2,
+        }}>
+          start!
+        </span>
         <h1 style={{
-          fontSize: 22,
+          fontSize: 30,
           fontWeight: 700,
           color: '#111',
           margin: 0,
-          lineHeight: 1.3,
+          lineHeight: 1.2,
+          letterSpacing: -0.5,
         }}>
-          어디서 출발하시나요
+          어디서 출발하시나요?
         </h1>
-        <p style={{ fontSize: 14, color: '#888', marginTop: 8, marginBottom: 0 }}>
-          2~5명의 출발역을 입력하세요
+        <p style={{ fontSize: 13, color: '#888', marginTop: 8, marginBottom: 0 }}>
+          2~5명의 출발역을 입력해 주세요
         </p>
       </motion.div>
 
@@ -90,29 +105,36 @@ export default function OriginScreen({ origins, onOriginsChange, names, onNamesC
         {origins.map((origin, i) => {
           const isDone = !!(names[i]?.trim()) && !!(origin.trim()) && !!confirmedOrigins[i];
           return (
-          <div key={i} style={{
-            background: '#fff',
-            borderRadius: 12,
-            border: '1px solid #e8e8e8',
-            padding: '16px',
-          }}>
+          <div key={i} style={cardStyle.origin(isDone)}>
             {/* 카드 헤더: 번호 + 삭제 */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
               <span style={{ fontSize: 11, fontWeight: 700, color: '#aaa', letterSpacing: 0.2 }}>
                 {i + 1}번 출발지
               </span>
-              {origins.length > 2 && (
-                <button
-                  onClick={() => removeOrigin(i)}
-                  style={{
-                    border: 'none', background: 'none', cursor: 'pointer',
-                    color: '#bbb', fontSize: 18, padding: '0 2px',
-                    display: 'flex', alignItems: 'center', lineHeight: 1,
-                  }}
-                >
-                  −
-                </button>
-              )}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                {isDone && (
+                  <motion.span
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.2 }}
+                    style={{ fontSize: 11, color: color.accent, fontWeight: 600 }}
+                  >
+                    ✓ 입력 완료
+                  </motion.span>
+                )}
+                {origins.length > 2 && (
+                  <button
+                    onClick={() => removeOrigin(i)}
+                    style={{
+                      border: 'none', background: 'none', cursor: 'pointer',
+                      color: '#bbb', fontSize: 18, padding: '0 2px',
+                      display: 'flex', alignItems: 'center', lineHeight: 1,
+                    }}
+                  >
+                    −
+                  </button>
+                )}
+              </div>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -122,19 +144,7 @@ export default function OriginScreen({ origins, onOriginsChange, names, onNamesC
                 onFocus={() => setFocusedNameIdx(i)}
                 onBlur={() => setFocusedNameIdx(null)}
                 placeholder={`이름 (예: ${['김우디', '이사잇', '박길', '최중', '오다섯'][i]})`}
-                style={{
-                  width: '100%',
-                  padding: '10px 14px',
-                  borderRadius: 8,
-                  border: `1px solid ${focusedNameIdx === i ? '#000' : '#e0e0e0'}`,
-                  boxShadow: 'none',
-                  fontSize: 14,
-                  color: '#111',
-                  outline: 'none',
-                  boxSizing: 'border-box',
-                  background: '#fafafa',
-                  transition: 'border-color 0.18s',
-                }}
+                style={inputStyle.nameField(focusedNameIdx === i)}
               />
               <StationInput
                 value={origin}
@@ -143,20 +153,6 @@ export default function OriginScreen({ origins, onOriginsChange, names, onNamesC
                 onReset={() => resetOrigin(i)}
                 index={i}
               />
-              {isDone && (
-                <motion.div
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.2 }}
-                  style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '2px 0 0 2px' }}
-                >
-                  <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-                    <circle cx="6.5" cy="6.5" r="6" fill="#22C55E" fillOpacity="0.12" />
-                    <path d="M4 6.5L5.8 8.5L9 5" stroke="#22C55E" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  <span style={{ fontSize: 11, color: '#22C55E', fontWeight: 500 }}>입력 완료</span>
-                </motion.div>
-              )}
             </div>
           </div>
           );
@@ -168,21 +164,7 @@ export default function OriginScreen({ origins, onOriginsChange, names, onNamesC
           onClick={addOrigin}
           whileTap={{ scale: 0.98 }}
           transition={{ duration: 0.12 }}
-          style={{
-            marginTop: 12,
-            width: '100%',
-            padding: '12px',
-            border: '1px dashed #d0d0d0',
-            borderRadius: 8,
-            background: 'none',
-            cursor: 'pointer',
-            fontSize: 14,
-            color: '#888',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 6,
-          }}
+          style={buttonStyle.addOrigin}
         >
           <span style={{ fontSize: 16 }}>+</span>
           출발지 추가
@@ -194,24 +176,13 @@ export default function OriginScreen({ origins, onOriginsChange, names, onNamesC
           position: 'fixed', bottom: 0, left: 0, right: 0,
           background: '#fff', borderTop: '1px solid #f0f0f0',
         }}>
-          <div style={{ maxWidth: 480, margin: '0 auto', padding: '16px 20px' }}>
+          <div style={{ maxWidth: 480, margin: '0 auto', padding: '14px clamp(16px, 5vw, 28px)' }}>
             <motion.button
               onClick={handleSubmit}
               disabled={!canSubmit}
               whileTap={canSubmit ? { scale: 0.98 } : {}}
               transition={{ duration: 0.12 }}
-              style={{
-                width: '100%',
-                height: 56,
-                borderRadius: 16,
-                border: 'none',
-                background: canSubmit ? '#111' : '#e0e0e0',
-                color: canSubmit ? '#fff' : '#aaa',
-                fontSize: 16,
-                fontWeight: 600,
-                cursor: canSubmit ? 'pointer' : 'not-allowed',
-                transition: 'background 0.15s',
-              }}
+              style={buttonStyle.primaryCta(canSubmit)}
             >
               {loading ? (
                 <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
