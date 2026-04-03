@@ -329,7 +329,10 @@ export default function ResultScreen({ result, onExplore, onBack }: Props) {
                 isSelected={c.stationId === selectedId}
                 description={makeDescription(c, candidates)}
                 displayScore={toDisplayScore(c.score, candidates)}
-                onSelect={() => setSelectedId(c.stationId)}
+                onSelect={() => {
+                  setSelectedId(c.stationId);
+                  trackEvent('result_select', { rank: c.rank, station: c.stationName });
+                }}
               />
             </motion.div>
           ))}

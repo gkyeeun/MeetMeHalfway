@@ -56,6 +56,7 @@ export default function OriginScreen({ origins, onOriginsChange, names, onNamesC
   const handleSubmit = () => {
     trackEvent('origin_input_complete', { count: origins.filter((o) => o).length });
     trackEvent('calculate_middle_click');
+    trackEvent('calculate_middle', { origin_count: origins.filter((o) => o).length });
     onSubmit();
   };
 

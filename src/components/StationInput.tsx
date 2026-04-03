@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { GRAPH } from '../services/graphBuilder';
 import { SUBWAY_GRAPH } from '../data/subwayGraph';
 import { color, radius, shadow, input as inputStyle } from '../tokens';
+import { trackEvent } from '../utils/ga4';
 
 // ─── 모듈 로드 시 한 번만 계산 ───────────────────────────────────────────────
 
@@ -70,6 +71,7 @@ export default function StationInput({ value, onChange, onConfirm, onReset, plac
     setQuery(name);
     onChange(name);
     onConfirm?.();
+    trackEvent('origin_complete', { station: name });
     setItems([]);
     setOpen(false);
     setHighlighted(-1);

@@ -106,6 +106,7 @@ function PlaceCard({
   const handleKakaoMap = (e: React.MouseEvent) => {
     e.stopPropagation();
     trackEvent('kakaomap_click', { name: place.name });
+    trackEvent('map_click', { name: place.name });
     if (place.placeUrl) {
       window.open(place.placeUrl, '_blank', 'noopener noreferrer');
     }
@@ -324,6 +325,7 @@ export default function PlaceScreen({ stationName, result, onBack, onReset }: Pr
   const handleCardClick = (i: number, scroll = false) => {
     setSelectedIndex(i);
     trackEvent('place_click', { name: places[i]?.name, category });
+    trackEvent('place_select', { name: places[i]?.name, category, index: i });
     if (scroll) {
       const card = cardRefs.current[i];
       const list = listRef.current;
