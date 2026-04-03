@@ -6,6 +6,7 @@ import ResultScreen from './screens/ResultScreen';
 import PlaceScreen from './screens/PlaceScreen';
 import { findMiddleStations } from './services/middleFinder';
 import type { MiddleResult } from './types';
+import DebugOverlay from './components/DebugOverlay';
 
 type Screen = 'origin' | 'result' | 'places';
 
@@ -194,6 +195,7 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
+      <DebugOverlay />
     </div>
   );
 }
