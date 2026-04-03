@@ -1,35 +1,5 @@
 // GA4 event tracking (ready structure — swap in actual gtag when deploying)
 
-// ─── Debug event log (consumed by DebugOverlay) ───────────────────────────────
-
-export interface GALogEntry {
-  name: string;
-  params?: Record<string, unknown>;
-  ts: string; // HH:MM:SS
-}
-
-const MAX_LOG = 10;
-const eventLog: GALogEntry[] = [];
-type LogListener = (log: GALogEntry[]) => void;
-const listeners = new Set<LogListener>();
-
-function pushLog(name: string, params?: Record<string, unknown>) {
-  const now = new Date();
-  const ts = [now.getHours(), now.getMinutes(), now.getSeconds()]
-    .map((n) => String(n).padStart(2, '0'))
-    .join(':');
-  eventLog.unshift({ name, params, ts });
-  if (eventLog.length > MAX_LOG) eventLog.pop();
-  listeners.forEach((fn) => fn([...eventLog]));
-}
-
-export function subscribeToLog(fn: LogListener): () => void {
-  listeners.add(fn);
-  fn([...eventLog]); // send current log immediately
-  return () => listeners.delete(fn);
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 type EventName =
   | 'origin_complete'
@@ -58,7 +28,6 @@ if (typeof window !== 'undefined' && (window as unknown as { gtag?: Function }).
 }
 
 export function trackEvent(name: EventName, params?: EventParams): void {
-  pushLog(name, params);
   if (typeof window !== 'undefined' && (window as unknown as { gtag?: Function }).gtag) {
     (window as unknown as { gtag: Function }).gtag('event', name, { ...params, debug_mode: isDebug });
   } else {
@@ -68,7 +37,6 @@ export function trackEvent(name: EventName, params?: EventParams): void {
 }
 
 export function trackPageView(page_title: string, page_path: string): void {
-  pushLog('page_view', { page_title, page_path });
   if (typeof window !== 'undefined' && (window as unknown as { gtag?: Function }).gtag) {
     (window as unknown as { gtag: Function }).gtag('event', 'page_view', { page_title, page_path, debug_mode: isDebug });
   } else {
