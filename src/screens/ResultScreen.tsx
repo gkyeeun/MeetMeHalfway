@@ -273,6 +273,7 @@ export default function ResultScreen({ result, onExplore, onBack }: Props) {
 
   const handleExplore = () => {
     if (!selectedCandidate) return;
+    console.log('Firing event: explore_click', { station: selectedCandidate.stationName });
     trackEvent('explore_click', { station: selectedCandidate.stationName });
     onExplore(selectedCandidate.stationName);
   };
@@ -333,6 +334,7 @@ export default function ResultScreen({ result, onExplore, onBack }: Props) {
                 displayScore={toDisplayScore(c.score, candidates)}
                 onSelect={() => {
                   setSelectedId(c.stationId);
+                  console.log('Firing event: result_select', { rank: c.rank, station: c.stationName });
                   trackEvent('result_select', { rank: c.rank, station: c.stationName });
                 }}
               />

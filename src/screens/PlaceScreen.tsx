@@ -96,6 +96,7 @@ function PlaceCard({
 
   const handleRoute = (e: React.MouseEvent) => {
     e.stopPropagation();
+    console.log('Firing event: route_click', { name: place.name });
     trackEvent('route_click', { name: place.name });
     if (place.lat && place.lng) {
       const url = `https://map.kakao.com/link/to/${encodeURIComponent(place.name)},${place.lat},${place.lng}`;
@@ -105,6 +106,7 @@ function PlaceCard({
 
   const handleKakaoMap = (e: React.MouseEvent) => {
     e.stopPropagation();
+    console.log('Firing event: kakaomap_click / map_click', { name: place.name });
     trackEvent('kakaomap_click', { name: place.name });
     trackEvent('map_click', { name: place.name });
     if (place.placeUrl) {
@@ -114,6 +116,7 @@ function PlaceCard({
 
   const handleShare = async (e: React.MouseEvent) => {
     e.stopPropagation();
+    console.log('Firing event: share_click', { name: place.name });
     trackEvent('share_click', { name: place.name });
     const shareUrl = place.placeUrl
       ?? (place.lat && place.lng
@@ -321,11 +324,13 @@ export default function PlaceScreen({ stationName, result, onBack, onReset }: Pr
 
   const handleCategoryChange = (cat: Category) => {
     setCategory(cat);
+    console.log('Firing event: category_click', { category: cat });
     trackEvent('category_click', { category: cat });
   };
 
   const handleCardClick = (i: number, scroll = false) => {
     setSelectedIndex(i);
+    console.log('Firing event: place_click / place_select', { name: places[i]?.name, category, index: i });
     trackEvent('place_click', { name: places[i]?.name, category });
     trackEvent('place_select', { name: places[i]?.name, category, index: i });
     if (scroll) {

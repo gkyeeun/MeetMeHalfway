@@ -71,6 +71,7 @@ export default function StationInput({ value, onChange, onConfirm, onReset, plac
     setQuery(name);
     onChange(name);
     onConfirm?.();
+    console.log('Firing event: origin_complete', { station: name });
     trackEvent('origin_complete', { station: name });
     setItems([]);
     setOpen(false);
