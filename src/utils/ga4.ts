@@ -21,9 +21,18 @@ interface EventParams {
   [key: string]: string | number | boolean | undefined;
 }
 
+const isDebug = typeof window !== 'undefined' && window.location.search.includes('debug_mode=true');
+
+// Re-configure gtag with debug_mode so DebugView receives events
+if (typeof window !== 'undefined' && (window as unknown as { gtag?: Function }).gtag) {
+  (window as unknown as { gtag: Function }).gtag('config', 'G-R77MWE8VM7', {
+    debug_mode: isDebug,
+  });
+}
+
 export function trackEvent(name: EventName, params?: EventParams): void {
   if (typeof window !== 'undefined' && (window as unknown as { gtag?: Function }).gtag) {
-    (window as unknown as { gtag: Function }).gtag('event', name, params);
+    (window as unknown as { gtag: Function }).gtag('event', name, { ...params, debug_mode: isDebug });
   } else {
     // Dev logging
     console.log('[GA4]', name, params);
@@ -32,7 +41,7 @@ export function trackEvent(name: EventName, params?: EventParams): void {
 
 export function trackPageView(page_title: string, page_path: string): void {
   if (typeof window !== 'undefined' && (window as unknown as { gtag?: Function }).gtag) {
-    (window as unknown as { gtag: Function }).gtag('event', 'page_view', { page_title, page_path });
+    (window as unknown as { gtag: Function }).gtag('event', 'page_view', { page_title, page_path, debug_mode: isDebug });
   } else {
     console.log('[GA4] page_view', { page_title, page_path });
   }
