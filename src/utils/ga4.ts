@@ -2,7 +2,9 @@
 type EventName =
   | 'origin_complete'
   | 'calculate_middle'
+  | 'result_view'
   | 'result_select'
+  | 'explore_click'
   | 'place_select'
   | 'route_click'
   | 'map_click'

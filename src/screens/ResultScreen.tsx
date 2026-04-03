@@ -267,12 +267,16 @@ export default function ResultScreen({ result, onExplore, onBack }: Props) {
   const { candidates, origins, names } = result;
   const [selectedId, setSelectedId] = useState(candidates[0]?.stationId ?? '');
 
-  useEffect(() => { trackPageView('Result', '/result'); }, []);
+  useEffect(() => {
+    trackPageView('Result', '/result');
+    trackEvent('result_view', { candidate_count: candidates.length });
+  }, []);
 
   const selectedCandidate = candidates.find((c) => c.stationId === selectedId);
 
   const handleExplore = () => {
     if (!selectedCandidate) return;
+    trackEvent('explore_click', { station: selectedCandidate.stationName, rank: selectedCandidate.rank });
     onExplore(selectedCandidate.stationName);
   };
 
