@@ -269,6 +269,7 @@ export default function ResultScreen({ result, onExplore, onBack }: Props) {
 
   useEffect(() => {
     trackPageView('Result', '/result');
+    console.log('Firing event: result_view', { candidate_count: candidates.length });
     trackEvent('result_view', { candidate_count: candidates.length });
   }, []);
 
@@ -276,6 +277,7 @@ export default function ResultScreen({ result, onExplore, onBack }: Props) {
 
   const handleExplore = () => {
     if (!selectedCandidate) return;
+    console.log('Firing event: explore_click', { station: selectedCandidate.stationName, rank: selectedCandidate.rank });
     trackEvent('explore_click', { station: selectedCandidate.stationName, rank: selectedCandidate.rank });
     onExplore(selectedCandidate.stationName);
   };
