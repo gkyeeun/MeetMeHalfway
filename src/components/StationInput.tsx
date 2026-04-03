@@ -117,7 +117,7 @@ export default function StationInput({ value, onChange, onConfirm, onReset, plac
   };
 
   // 지우기
-  const handleClear = (e: React.MouseEvent) => {
+  const handleClear = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault(); // blur 방지
     setQuery('');
     onChange('');
