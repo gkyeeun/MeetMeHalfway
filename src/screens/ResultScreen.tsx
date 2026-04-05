@@ -266,7 +266,17 @@ function CandidateCard({
 export default function ResultScreen({ result, onExplore, onBack }: Props) {
   const { candidates, origins, names } = result;
   const [selectedId, setSelectedId] = useState(candidates[0]?.stationId ?? '');
-  const exploredRef = useRef(false);
+  const exploredRef  = useRef(false);
+  const exitFiredRef = useRef(false);
+
+  const fireResultExit = (exit_type: 'back' | 'visibility') => {
+    if (exploredRef.current || exitFiredRef.current) return;
+    exitFiredRef.current = true;
+    trackEvent('result_exit', { selected_station: selectedCandidateRef.current?.stationName, selected_rank: selectedCandidateRef.current?.rank, exit_type });
+  };
+
+  // keep a ref so the visibilitychange handler can read the latest selectedCandidate
+  const selectedCandidateRef = useRef<typeof candidates[number] | undefined>(undefined);
 
   useEffect(() => {
     trackPageView('Result', '/result');
@@ -274,7 +284,16 @@ export default function ResultScreen({ result, onExplore, onBack }: Props) {
     trackEvent('result_view', { candidate_count: candidates.length });
   }, []);
 
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === 'hidden') fireResultExit('visibility');
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, []);
+
   const selectedCandidate = candidates.find((c) => c.stationId === selectedId);
+  selectedCandidateRef.current = selectedCandidate;
 
   const handleExplore = () => {
     if (!selectedCandidate) return;
@@ -285,9 +304,7 @@ export default function ResultScreen({ result, onExplore, onBack }: Props) {
   };
 
   const handleBack = () => {
-    if (!exploredRef.current) {
-      trackEvent('result_exit', { selected_station: selectedCandidate?.stationName, selected_rank: selectedCandidate?.rank });
-    }
+    fireResultExit('back');
     onBack();
   };
 
