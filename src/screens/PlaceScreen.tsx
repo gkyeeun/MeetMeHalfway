@@ -124,7 +124,7 @@ function PlaceCard({
       text: `${place.name} 어때요?${place.address ? ` ${place.address}` : ''}`,
       url: shareUrl,
     };
-    const shareMethod = navigator.share && navigator.canShare(shareData) ? 'native' : 'clipboard';
+    const shareMethod = ('share' in navigator) && navigator.canShare(shareData) ? 'native' : 'clipboard';
     console.log('Firing event: share_click', { name: place.name, share_method: shareMethod });
     trackEvent('share_click', { name: place.name, share_method: shareMethod });
     if (shareMethod === 'native') {
