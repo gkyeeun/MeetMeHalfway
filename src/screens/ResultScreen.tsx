@@ -266,17 +266,22 @@ function CandidateCard({
 export default function ResultScreen({ result, onExplore, onBack }: Props) {
   const { candidates, origins, names } = result;
   const [selectedId, setSelectedId] = useState(candidates[0]?.stationId ?? '');
-  const exploredRef  = useRef(false);
-  const exitFiredRef = useRef(false);
+  const exploredRef         = useRef(false);
+  const exitFiredRef        = useRef(false);
+  // null = user never tapped a card; populated on first explicit tap
+  const explicitSelectionRef = useRef<{ station: string; rank: number } | null>(null);
 
   const fireResultExit = (exit_type: 'back' | 'visibility') => {
     if (exploredRef.current || exitFiredRef.current) return;
     exitFiredRef.current = true;
-    trackEvent('result_exit', { selected_station: selectedCandidateRef.current?.stationName, selected_rank: selectedCandidateRef.current?.rank, exit_type });
+    const sel = explicitSelectionRef.current;
+    trackEvent('result_exit', {
+      exit_type,
+      had_explicit_selection: sel !== null,
+      selected_station: sel?.station ?? null,
+      selected_rank: sel?.rank ?? null,
+    });
   };
-
-  // keep a ref so the visibilitychange handler can read the latest selectedCandidate
-  const selectedCandidateRef = useRef<typeof candidates[number] | undefined>(undefined);
 
   useEffect(() => {
     trackPageView('Result', '/result');
@@ -293,13 +298,13 @@ export default function ResultScreen({ result, onExplore, onBack }: Props) {
   }, []);
 
   const selectedCandidate = candidates.find((c) => c.stationId === selectedId);
-  selectedCandidateRef.current = selectedCandidate;
 
   const handleExplore = () => {
     if (!selectedCandidate) return;
     exploredRef.current = true;
-    console.log('Firing event: explore_click', { station: selectedCandidate.stationName, rank: selectedCandidate.rank });
-    trackEvent('explore_click', { station: selectedCandidate.stationName, rank: selectedCandidate.rank });
+    const hadExplicit = explicitSelectionRef.current !== null;
+    console.log('Firing event: explore_click', { station: selectedCandidate.stationName, rank: selectedCandidate.rank, had_explicit_selection: hadExplicit });
+    trackEvent('explore_click', { station: selectedCandidate.stationName, rank: selectedCandidate.rank, had_explicit_selection: hadExplicit });
     onExplore(selectedCandidate.stationName);
   };
 
@@ -364,6 +369,7 @@ export default function ResultScreen({ result, onExplore, onBack }: Props) {
                 displayScore={toDisplayScore(c.score, candidates)}
                 onSelect={() => {
                   setSelectedId(c.stationId);
+                  explicitSelectionRef.current = { station: c.stationName, rank: c.rank };
                   console.log('Firing event: result_select', { rank: c.rank, station: c.stationName });
                   trackEvent('result_select', { rank: c.rank, station: c.stationName });
                 }}

@@ -16,7 +16,7 @@ type EventName =
 
 
 interface EventParams {
-  [key: string]: string | number | boolean | undefined;
+  [key: string]: string | number | boolean | null | undefined;
 }
 
 const isDebug = typeof window !== 'undefined' && window.location.search.includes('debug_mode=true');
