@@ -5,6 +5,7 @@ type EventName =
   | 'origin_complete'
   | 'calculate_middle'
   | 'result_view'
+  | 'result_exit'
   | 'result_select'
   | 'explore_click'
   | 'place_select'

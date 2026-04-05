@@ -56,8 +56,9 @@ export default function OriginScreen({ origins, onOriginsChange, names, onNamesC
   const canSubmit = !loading && origins.filter((o) => o.trim().length > 0).length >= 2;
 
   const handleSubmit = () => {
-    console.log('Firing event: calculate_middle', { origin_count: origins.filter((o) => o).length });
-    trackEvent('calculate_middle', { origin_count: origins.filter((o) => o).length });
+    const validOrigins = origins.filter((o) => o.trim());
+    console.log('Firing event: calculate_middle', { person_count: validOrigins.length, origin_stations: validOrigins.join(',') });
+    trackEvent('calculate_middle', { person_count: validOrigins.length, origin_stations: validOrigins.join(',') });
     onSubmit();
   };
 
@@ -154,6 +155,7 @@ export default function OriginScreen({ origins, onOriginsChange, names, onNamesC
                 onConfirm={() => confirmOrigin(i)}
                 onReset={() => resetOrigin(i)}
                 index={i}
+                personCount={origins.length}
               />
             </div>
           </div>

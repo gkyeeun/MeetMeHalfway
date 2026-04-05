@@ -51,9 +51,10 @@ interface Props {
   onReset?: () => void;
   placeholder?: string;
   index: number;
+  personCount: number;
 }
 
-export default function StationInput({ value, onChange, onConfirm, onReset, placeholder }: Props) {
+export default function StationInput({ value, onChange, onConfirm, onReset, placeholder, index, personCount }: Props) {
   const [query,       setQuery]       = useState(value);
   const [items,       setItems]       = useState<AutocompleteItem[]>([]);
   const [open,        setOpen]        = useState(false);
@@ -71,8 +72,8 @@ export default function StationInput({ value, onChange, onConfirm, onReset, plac
     setQuery(name);
     onChange(name);
     onConfirm?.();
-    console.log('Firing event: origin_complete', { station: name });
-    trackEvent('origin_complete', { station: name });
+    console.log('Firing event: origin_complete', { station: name, input_index: index, person_count: personCount });
+    trackEvent('origin_complete', { station: name, input_index: index, person_count: personCount });
     setItems([]);
     setOpen(false);
     setHighlighted(-1);

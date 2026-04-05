@@ -115,8 +115,6 @@ function PlaceCard({
 
   const handleShare = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log('Firing event: share_click', { name: place.name });
-    trackEvent('share_click', { name: place.name });
     const shareUrl = place.placeUrl
       ?? (place.lat && place.lng
         ? `https://map.kakao.com/link/map/${encodeURIComponent(place.name)},${place.lat},${place.lng}`
@@ -126,7 +124,10 @@ function PlaceCard({
       text: `${place.name} 어때요?${place.address ? ` ${place.address}` : ''}`,
       url: shareUrl,
     };
-    if (navigator.share && navigator.canShare?.(shareData)) {
+    const shareMethod = navigator.share && navigator.canShare?.(shareData) ? 'native' : 'clipboard';
+    console.log('Firing event: share_click', { name: place.name, share_method: shareMethod });
+    trackEvent('share_click', { name: place.name, share_method: shareMethod });
+    if (shareMethod === 'native') {
       await navigator.share(shareData).catch(() => null);
     } else {
       await navigator.clipboard.writeText(shareUrl).catch(() => null);
@@ -329,8 +330,8 @@ export default function PlaceScreen({ stationName, result, onBack, onReset }: Pr
 
   const handleCardClick = (i: number, scroll = false) => {
     setSelectedIndex(i);
-    console.log('Firing event: place_select', { name: places[i]?.name, category, index: i });
-    trackEvent('place_select', { name: places[i]?.name, category, index: i });
+    console.log('Firing event: place_select', { name: places[i]?.name, category, index: i, station: stationName, distance_from_station: places[i]?.distance });
+    trackEvent('place_select', { name: places[i]?.name, category, index: i, station: stationName, distance_from_station: places[i]?.distance });
     if (scroll) {
       const card = cardRefs.current[i];
       const list = listRef.current;

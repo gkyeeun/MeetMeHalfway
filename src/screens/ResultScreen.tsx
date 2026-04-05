@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import type { MiddleResult } from '../types';
 import type { CandidateStation } from '../types/subway';
@@ -266,6 +266,7 @@ function CandidateCard({
 export default function ResultScreen({ result, onExplore, onBack }: Props) {
   const { candidates, origins, names } = result;
   const [selectedId, setSelectedId] = useState(candidates[0]?.stationId ?? '');
+  const exploredRef = useRef(false);
 
   useEffect(() => {
     trackPageView('Result', '/result');
@@ -277,16 +278,24 @@ export default function ResultScreen({ result, onExplore, onBack }: Props) {
 
   const handleExplore = () => {
     if (!selectedCandidate) return;
+    exploredRef.current = true;
     console.log('Firing event: explore_click', { station: selectedCandidate.stationName, rank: selectedCandidate.rank });
     trackEvent('explore_click', { station: selectedCandidate.stationName, rank: selectedCandidate.rank });
     onExplore(selectedCandidate.stationName);
+  };
+
+  const handleBack = () => {
+    if (!exploredRef.current) {
+      trackEvent('result_exit', { selected_station: selectedCandidate?.stationName, selected_rank: selectedCandidate?.rank });
+    }
+    onBack();
   };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <div style={{ padding: 'clamp(28px, 6vw, 48px) clamp(16px, 5vw, 28px) 0', flex: 1 }}>
         <motion.button
-          onClick={onBack}
+          onClick={handleBack}
           whileTap={{ scale: 0.97 }}
           transition={{ duration: 0.12 }}
           style={buttonStyle.ghost}
