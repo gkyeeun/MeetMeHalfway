@@ -47,6 +47,7 @@ export default function OriginScreen({ origins, onOriginsChange, names, onNamesC
 
   const confirmOrigin = (index: number) => {
     setConfirmedOrigins(prev => { const c = [...prev]; c[index] = true; return c; });
+    if (origins.length === 1) addOrigin();
   };
 
   const resetOrigin = (index: number) => {
