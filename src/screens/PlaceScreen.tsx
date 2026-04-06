@@ -344,8 +344,9 @@ export default function PlaceScreen({ stationName, stationRank, hadExplicitSelec
   const handleCardClick = (i: number, scroll = false) => {
     setSelectedIndex(i);
     usedAutoSelectedRef.current = false;
-    console.log('Firing event: place_select', { name: places[i]?.name, category, index: i, station: stationName, distance_from_station: places[i]?.distance });
-    trackEvent('place_select', { name: places[i]?.name, category, index: i, station: stationName, distance_from_station: places[i]?.distance });
+    const sort_mode = sortKey === 'recommend' ? 'recommended' : 'distance';
+    console.log('Firing event: place_select', { name: places[i]?.name, category, index: i, station: stationName, distance_from_station: places[i]?.distance, sort_mode });
+    trackEvent('place_select', { name: places[i]?.name, category, index: i, station: stationName, distance_from_station: places[i]?.distance, sort_mode });
     if (scroll) {
       const card = cardRefs.current[i];
       const list = listRef.current;
@@ -530,7 +531,11 @@ export default function PlaceScreen({ stationName, stationRank, hadExplicitSelec
       }}>
         <div style={{ maxWidth: 480, margin: '0 auto', padding: '14px clamp(16px, 5vw, 28px)' }}>
           <motion.button
-            onClick={onReset}
+            onClick={() => {
+              console.log('Firing event: place_retry_click', { station: stationName, rank: stationRank });
+              trackEvent('place_retry_click', { station: stationName, rank: stationRank });
+              onReset();
+            }}
             whileTap={{ scale: 0.98 }}
             transition={{ duration: 0.12 }}
             style={buttonStyle.secondaryCta}
