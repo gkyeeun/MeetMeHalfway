@@ -86,20 +86,21 @@ function getOriginCoords(result: MiddleResult | null): [OriginCoords, OriginCoor
 // ─── 장소 카드 ────────────────────────────────────────────────────────────────
 
 function PlaceCard({
-  place, index, isSelected, accentColor, onClick,
+  place, index, isSelected, accentColor, usedAutoSelected, onClick,
 }: {
   place: Place;
   index: number;
   isSelected: boolean;
   accentColor: string;
+  usedAutoSelected: boolean;
   onClick: () => void;
 }) {
   const [copyMsg, setCopyMsg] = useState<string | null>(null);
 
   const handleRoute = (e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log('Firing event: route_click', { name: place.name });
-    trackEvent('route_click', { name: place.name });
+    console.log('Firing event: route_click', { name: place.name, used_auto_selected: usedAutoSelected });
+    trackEvent('route_click', { name: place.name, used_auto_selected: usedAutoSelected });
     if (place.lat && place.lng) {
       const url = `https://map.kakao.com/link/to/${encodeURIComponent(place.name)},${place.lat},${place.lng}`;
       window.open(url, '_blank', 'noopener noreferrer');
@@ -108,8 +109,8 @@ function PlaceCard({
 
   const handleKakaoMap = (e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log('Firing event: map_click', { name: place.name });
-    trackEvent('map_click', { name: place.name });
+    console.log('Firing event: map_click', { name: place.name, used_auto_selected: usedAutoSelected });
+    trackEvent('map_click', { name: place.name, used_auto_selected: usedAutoSelected });
     if (place.placeUrl) {
       window.open(place.placeUrl, '_blank', 'noopener noreferrer');
     }
@@ -127,8 +128,8 @@ function PlaceCard({
       url: shareUrl,
     };
     const shareMethod = ('share' in navigator) && navigator.canShare(shareData) ? 'native' : 'clipboard';
-    console.log('Firing event: share_click', { name: place.name, share_method: shareMethod });
-    trackEvent('share_click', { name: place.name, share_method: shareMethod });
+    console.log('Firing event: share_click', { name: place.name, share_method: shareMethod, used_auto_selected: usedAutoSelected });
+    trackEvent('share_click', { name: place.name, share_method: shareMethod, used_auto_selected: usedAutoSelected });
     if (shareMethod === 'native') {
       await navigator.share(shareData).catch(() => null);
     } else {
@@ -290,8 +291,9 @@ export default function PlaceScreen({ stationName, stationRank, hadExplicitSelec
   const [sortKey,       setSortKey]       = useState<SortKey>('recommend');
   const [loading,       setLoading]       = useState(true);
   const [error,         setError]         = useState<string | null>(null);
-  const abortRef     = useRef<AbortController | null>(null);
-  const viewFiredRef = useRef(false);
+  const abortRef          = useRef<AbortController | null>(null);
+  const viewFiredRef      = useRef(false);
+  const usedAutoSelectedRef = useRef(true);
 
   const accentColor = color.accent;
   const originCoords = getOriginCoords(result);
@@ -341,6 +343,7 @@ export default function PlaceScreen({ stationName, stationRank, hadExplicitSelec
 
   const handleCardClick = (i: number, scroll = false) => {
     setSelectedIndex(i);
+    usedAutoSelectedRef.current = false;
     console.log('Firing event: place_select', { name: places[i]?.name, category, index: i, station: stationName, distance_from_station: places[i]?.distance });
     trackEvent('place_select', { name: places[i]?.name, category, index: i, station: stationName, distance_from_station: places[i]?.distance });
     if (scroll) {
@@ -512,6 +515,7 @@ export default function PlaceScreen({ stationName, stationRank, hadExplicitSelec
                 index={i}
                 isSelected={i === selectedIndex}
                 accentColor={accentColor}
+                usedAutoSelected={usedAutoSelectedRef.current}
                 onClick={() => handleCardClick(i)}
               />
             </motion.div>
