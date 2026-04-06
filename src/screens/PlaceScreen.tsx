@@ -290,12 +290,20 @@ export default function PlaceScreen({ stationName, stationRank, hadExplicitSelec
   const [sortKey,       setSortKey]       = useState<SortKey>('recommend');
   const [loading,       setLoading]       = useState(true);
   const [error,         setError]         = useState<string | null>(null);
-  const abortRef = useRef<AbortController | null>(null);
+  const abortRef     = useRef<AbortController | null>(null);
+  const viewFiredRef = useRef(false);
 
   const accentColor = color.accent;
   const originCoords = getOriginCoords(result);
 
   useEffect(() => { trackPageView('Place', '/place'); }, []);
+
+  useEffect(() => {
+    if (loading || viewFiredRef.current) return;
+    viewFiredRef.current = true;
+    console.log('Firing event: place_view', { station: stationName, rank: stationRank, place_count: rawPlaces.length, had_explicit_selection: hadExplicitSelection });
+    trackEvent('place_view', { station: stationName, rank: stationRank, place_count: rawPlaces.length, had_explicit_selection: hadExplicitSelection });
+  }, [loading, rawPlaces]);
   const places = sortPlaces(rawPlaces, sortKey, originCoords);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const listRef  = useRef<HTMLDivElement | null>(null);
@@ -314,8 +322,6 @@ export default function PlaceScreen({ stationName, stationRank, hadExplicitSelec
         const finalPlaces = results.length > 0 ? results : getPlacesByStation(stationName, category);
         setRawPlaces(finalPlaces);
         setLoading(false);
-        console.log('Firing event: place_view', { station: stationName, rank: stationRank, place_count: finalPlaces.length, had_explicit_selection: hadExplicitSelection });
-        trackEvent('place_view', { station: stationName, rank: stationRank, place_count: finalPlaces.length, had_explicit_selection: hadExplicitSelection });
       })
       .catch((err) => {
         if (err?.name === 'AbortError') return;
