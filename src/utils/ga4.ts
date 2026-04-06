@@ -8,6 +8,7 @@ type EventName =
   | 'result_exit'
   | 'result_select'
   | 'explore_click'
+  | 'place_view'
   | 'place_select'
   | 'route_click'
   | 'map_click'

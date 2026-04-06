@@ -22,7 +22,9 @@ export default function App() {
   const [origins,             setOrigins]             = useState<string[]>(['', '']);
   const [names,               setNames]               = useState<string[]>(['', '']);
   const [result,              setResult]              = useState<MiddleResult | null>(null);
-  const [selectedStationName, setSelectedStationName] = useState<string>('');
+  const [selectedStationName,      setSelectedStationName]      = useState<string>('');
+  const [selectedStationRank,      setSelectedStationRank]      = useState<number>(1);
+  const [hadExplicitSelection,     setHadExplicitSelection]     = useState<boolean>(false);
   const [loading,             setLoading]             = useState(false);
 
   useEffect(() => {
@@ -41,6 +43,8 @@ export default function App() {
     setNames(['', '']);
     setResult(null);
     setSelectedStationName('');
+    setSelectedStationRank(1);
+    setHadExplicitSelection(false);
     setLoading(false);
     setScreen('origin');
   };
@@ -82,8 +86,10 @@ export default function App() {
     }, 320);
   };
 
-  const handleExplore = (stationName: string) => {
+  const handleExplore = (stationName: string, rank: number, hadExplicit: boolean) => {
     setSelectedStationName(stationName);
+    setSelectedStationRank(rank);
+    setHadExplicitSelection(hadExplicit);
     setScreen('places');
   };
 
@@ -187,6 +193,8 @@ export default function App() {
           <motion.div key="places" {...pageAnim}>
             <PlaceScreen
               stationName={selectedStationName}
+              stationRank={selectedStationRank}
+              hadExplicitSelection={hadExplicitSelection}
               result={result}
               onBack={goToResultScreen}
               onReset={resetAppState}

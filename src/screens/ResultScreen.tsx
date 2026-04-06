@@ -9,7 +9,7 @@ import { color, button as buttonStyle } from '../tokens';
 
 interface Props {
   result: MiddleResult;
-  onExplore: (stationName: string) => void;
+  onExplore: (stationName: string, rank: number, hadExplicitSelection: boolean) => void;
   onBack: () => void;
 }
 
@@ -305,7 +305,7 @@ export default function ResultScreen({ result, onExplore, onBack }: Props) {
     const hadExplicit = explicitSelectionRef.current !== null;
     console.log('Firing event: explore_click', { station: selectedCandidate.stationName, rank: selectedCandidate.rank, had_explicit_selection: hadExplicit });
     trackEvent('explore_click', { station: selectedCandidate.stationName, rank: selectedCandidate.rank, had_explicit_selection: hadExplicit });
-    onExplore(selectedCandidate.stationName);
+    onExplore(selectedCandidate.stationName, selectedCandidate.rank, hadExplicit);
   };
 
   const handleBack = () => {

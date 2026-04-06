@@ -13,6 +13,8 @@ import { color, button as buttonStyle } from '../tokens';
 
 interface Props {
   stationName: string;
+  stationRank: number;
+  hadExplicitSelection: boolean;
   result: MiddleResult | null;
   onBack: () => void;
   onReset: () => void;
@@ -281,7 +283,7 @@ function PlaceCard({
 
 // ─── PlaceScreen ──────────────────────────────────────────────────────────────
 
-export default function PlaceScreen({ stationName, result, onBack, onReset }: Props) {
+export default function PlaceScreen({ stationName, stationRank, hadExplicitSelection, result, onBack, onReset }: Props) {
   const [category,      setCategory]      = useState<Category>('카페');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [rawPlaces,     setRawPlaces]     = useState<Place[]>([]);
@@ -309,8 +311,11 @@ export default function PlaceScreen({ stationName, result, onBack, onReset }: Pr
 
     searchPlacesByStation(stationName, category)
       .then((results) => {
-        setRawPlaces(results.length > 0 ? results : getPlacesByStation(stationName, category));
+        const finalPlaces = results.length > 0 ? results : getPlacesByStation(stationName, category);
+        setRawPlaces(finalPlaces);
         setLoading(false);
+        console.log('Firing event: place_view', { station: stationName, rank: stationRank, place_count: finalPlaces.length, had_explicit_selection: hadExplicitSelection });
+        trackEvent('place_view', { station: stationName, rank: stationRank, place_count: finalPlaces.length, had_explicit_selection: hadExplicitSelection });
       })
       .catch((err) => {
         if (err?.name === 'AbortError') return;
