@@ -99,8 +99,8 @@ function PlaceCard({
 
   const handleRoute = (e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log('Firing event: route_click', { name: place.name, used_auto_selected: usedAutoSelected });
-    trackEvent('route_click', { name: place.name, used_auto_selected: usedAutoSelected });
+    console.log('Firing event: route_click', { name: place.name, used_auto_selected: usedAutoSelected ? "true" : "false" });
+    trackEvent('route_click', { name: place.name, used_auto_selected: usedAutoSelected ? "true" : "false" });
     if (place.lat && place.lng) {
       const url = `https://map.kakao.com/link/to/${encodeURIComponent(place.name)},${place.lat},${place.lng}`;
       window.open(url, '_blank', 'noopener noreferrer');
@@ -109,8 +109,8 @@ function PlaceCard({
 
   const handleKakaoMap = (e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log('Firing event: map_click', { name: place.name, used_auto_selected: usedAutoSelected });
-    trackEvent('map_click', { name: place.name, used_auto_selected: usedAutoSelected });
+    console.log('Firing event: map_click', { name: place.name, used_auto_selected: usedAutoSelected ? "true" : "false" });
+    trackEvent('map_click', { name: place.name, used_auto_selected: usedAutoSelected ? "true" : "false" });
     if (place.placeUrl) {
       window.open(place.placeUrl, '_blank', 'noopener noreferrer');
     }
@@ -128,8 +128,8 @@ function PlaceCard({
       url: shareUrl,
     };
     const shareMethod = ('share' in navigator) && navigator.canShare(shareData) ? 'native' : 'clipboard';
-    console.log('Firing event: share_click', { name: place.name, share_method: shareMethod, used_auto_selected: usedAutoSelected });
-    trackEvent('share_click', { name: place.name, share_method: shareMethod, used_auto_selected: usedAutoSelected });
+    console.log('Firing event: share_click', { name: place.name, share_method: shareMethod, used_auto_selected: usedAutoSelected ? "true" : "false" });
+    trackEvent('share_click', { name: place.name, share_method: shareMethod, used_auto_selected: usedAutoSelected ? "true" : "false" });
     if (shareMethod === 'native') {
       await navigator.share(shareData).catch(() => null);
     } else {
