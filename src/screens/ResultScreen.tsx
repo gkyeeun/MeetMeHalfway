@@ -14,12 +14,21 @@ interface Props {
 }
 
 // ─── 사잇길 점수 (낮은 raw score → 높은 표시 점수) ──────────────────────────────
+//
+// displayRange = min(rawRange × 2, 65)
+// displayScore = 100 - ((rawScore - rawMin) / rawRange) × displayRange
+//
+// 효과: 후보들이 실제로 비슷하면 점수도 비슷하게, 차이가 크면 점수 차도 크게 표시
 
 function toDisplayScore(rawScore: number, all: CandidateStation[]): number {
-  const min = Math.min(...all.map((c) => c.score));
-  const max = Math.max(...all.map((c) => c.score));
-  if (max === min) return 100;
-  return Math.max(60, Math.round(100 - ((rawScore - min) / (max - min)) * 100));
+  const scores = all.map(c => c.score);
+  const min = Math.min(...scores);
+  const max = Math.max(...scores);
+  if (max === min) return 95;
+  const range = max - min;
+  // Display spread is proportional to actual raw spread, capped at 65
+  const displayRange = Math.min(range * 2, 65);
+  return Math.max(0, Math.round(100 - ((rawScore - min) / range) * displayRange));
 }
 
 // ─── 카드 설명 ─────────────────────────────────────────────────────────────────
