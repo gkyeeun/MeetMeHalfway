@@ -114,7 +114,7 @@ function CandidateCard({
       transition={{ duration: 0.18, ease: [0.25, 0.1, 0.25, 1] }}
       style={{
         borderRadius: 14,
-        border: isSelected ? `1.5px solid ${lineColor}` : isTop ? `1.5px solid ${lineColor}60` : `1px solid ${color.border}`,
+        border: isSelected ? `1.5px solid ${lineColor}` : `1px solid ${color.border}`,
         background: '#fff',
         marginBottom: 12,
         cursor: 'pointer',
@@ -128,7 +128,7 @@ function CandidateCard({
       {/* 상단 컬러 바 */}
       <div style={{
         height: 4,
-        background: isSelected ? lineColor : isTop ? `${lineColor}50` : '#f0f0f0',
+        background: isSelected ? lineColor : '#f0f0f0',
         transition: 'background 0.2s',
       }} />
 
