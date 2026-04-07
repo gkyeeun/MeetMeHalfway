@@ -127,10 +127,11 @@ function summarizePath(pathIds: string[]): string[] {
 
 // ─── 점수 계산 ────────────────────────────────────────────────────────────────
 //
-// score = avgTime*0.5 + spread*0.3 + tieredTransferPenalty
+// score = spread*0.55 + maxTime*0.25 + avgTime*0.1 + tieredTransferPenalty
 //       - hubBonus  (환승 허브일수록 유리)
 //       + remotePenalty (평균 60분 초과 시 소폭 패널티)
 //
+// 우선순위: 공평성(spread) > 최대이동시간(maxTime) > 평균시간(avgTime) > 환승편의
 // transfer penalty (비선형): 0회→0  1회→+1  2회→+3  3회+→+6
 
 function tieredTransferPenalty(avgTransfers: number): number {
@@ -153,7 +154,7 @@ function calcScore(
   const tPenalty      = tieredTransferPenalty(avgTransfers);
   const hubBonus      = (lineCount - 1) * 3.5;
   const remotePenalty = Math.max(0, (avgTime - 60) * 0.05);
-  return avgTime * 0.5 + spread * 0.3 + tPenalty - hubBonus + remotePenalty;
+  return spread * 0.55 + maxTime * 0.25 + avgTime * 0.1 + tPenalty - hubBonus + remotePenalty;
 }
 
 // ─── 메인 함수 ────────────────────────────────────────────────────────────────

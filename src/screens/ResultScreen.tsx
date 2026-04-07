@@ -28,9 +28,9 @@ function makeDescription(c: CandidateStation, all: CandidateStation[]): string {
   const minSpread = Math.min(...all.map(x => x.spread));
   const minAvg    = Math.min(...all.map(x => x.avgDuration));
 
-  if (c.spread === minSpread && c.spread <= 5) return '모든 분의 이동시간이 가장 균형 잡혀 있어요';
-  if (c.avgDuration === minAvg)                return '전체 이동시간이 가장 짧은 후보예요';
-  return '누군가 조금 더 빠르게 도착할 수 있는 대안이에요';
+  if (c.spread === minSpread) return '모든 분의 이동시간이 가장 공평하게 맞는 후보예요';
+  if (c.avgDuration === minAvg) return '누군가만 유독 오래 걸리지 않는 후보예요';
+  return '이동 균형과 총 시간을 함께 고려한 대안이에요';
 }
 
 // ─── 경로 한 줄 표시 ───────────────────────────────────────────────────────────
