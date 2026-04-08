@@ -275,8 +275,9 @@ function CandidateCard({
 export default function ResultScreen({ result, onExplore, onBack }: Props) {
   const { candidates, origins, names } = result;
   const [selectedId, setSelectedId] = useState(candidates[0]?.stationId ?? '');
-  const exploredRef         = useRef(false);
-  const exitFiredRef        = useRef(false);
+  const exploredRef          = useRef(false);
+  const exitFiredRef         = useRef(false);
+  const mountTimeRef         = useRef(Date.now());
   // null = user never tapped a card; populated on first explicit tap
   const explicitSelectionRef = useRef<{ station: string; rank: number } | null>(null);
 
@@ -284,11 +285,13 @@ export default function ResultScreen({ result, onExplore, onBack }: Props) {
     if (exploredRef.current || exitFiredRef.current) return;
     exitFiredRef.current = true;
     const sel = explicitSelectionRef.current;
+    const stay_duration_sec = Math.round((Date.now() - mountTimeRef.current) / 1000);
     trackEvent('result_exit', {
       exit_type,
       had_explicit_selection: sel !== null,
       selected_station: sel?.station ?? null,
       selected_rank: sel?.rank ?? null,
+      stay_duration_sec,
     });
   };
 
