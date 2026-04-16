@@ -4,47 +4,43 @@
 <head>
   <meta charset="UTF-8" />
 
-  <head>
-    <meta charset="UTF-8" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-R77MWE8VM7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-R77MWE8VM7');
+  </script>
+  <script>
+    (function (m, a, z, e) {
+      var s, t, u, v;
+      try {
+        t = m.sessionStorage.getItem('maze-us');
+      } catch (err) { }
 
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R77MWE8VM7"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() { dataLayer.push(arguments); }
-      gtag('js', new Date());
-      gtag('config', 'G-R77MWE8VM7');
-    </script>
-    <script>
-      (function (m, a, z, e) {
-        var s, t, u, v;
+      if (!t) {
+        t = new Date().getTime();
         try {
-          t = m.sessionStorage.getItem('maze-us');
+          m.sessionStorage.setItem('maze-us', t);
         } catch (err) { }
+      }
 
-        if (!t) {
-          t = new Date().getTime();
-          try {
-            m.sessionStorage.setItem('maze-us', t);
-          } catch (err) { }
-        }
+      u = document.currentScript || (function () {
+        var w = document.getElementsByTagName('script');
+        return w[w.length - 1];
+      })();
+      v = u && u.nonce;
 
-        u = document.currentScript || (function () {
-          var w = document.getElementsByTagName('script');
-          return w[w.length - 1];
-        })();
-        v = u && u.nonce;
+      s = a.createElement('script');
+      s.src = z + '?apiKey=' + e;
+      s.async = true;
+      if (v) s.setAttribute('nonce', v);
+      a.getElementsByTagName('head')[0].appendChild(s);
+      m.mazeUniversalSnippetApiKey = e;
+    })(window, document, 'https://snippet.maze.co/maze-universal-loader.js', '3d9fe9da-5c14-4cbf-bbb3-b8b7751eaa45');
+  </script>
 
-        s = a.createElement('script');
-        s.src = z + '?apiKey=' + e;
-        s.async = true;
-        if (v) s.setAttribute('nonce', v);
-        a.getElementsByTagName('head')[0].appendChild(s);
-        m.mazeUniversalSnippetApiKey = e;
-      })(window, document, 'https://snippet.maze.co/maze-universal-loader.js', '3d9fe9da-5c14-4cbf-bbb3-b8b7751eaa45');
-    </script>
-
-  </head>
   <!-- Useberry UT script -->
   <script type="text/javascript" src="https://api.useberry.com/integrations/liveUrl/scripts/useberryScript.js"></script>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />

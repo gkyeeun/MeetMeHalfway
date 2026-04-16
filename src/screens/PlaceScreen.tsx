@@ -529,7 +529,7 @@ export default function PlaceScreen({ stationName, stationRank, hadExplicitSelec
         position: 'fixed', bottom: 0, left: 0, right: 0,
         background: '#fff', borderTop: '1px solid #f0f0f0',
       }}>
-        <div style={{ maxWidth: 480, margin: '0 auto', padding: '14px clamp(16px, 5vw, 28px)' }}>
+        <div style={{ maxWidth: 480, margin: '0 auto', padding: '14px clamp(16px, 5vw, 28px)', display: 'flex', gap: 8 }}>
           <motion.button
             onClick={() => {
               console.log('Firing event: place_retry_click', { station: stationName, rank: stationRank });
@@ -538,9 +538,23 @@ export default function PlaceScreen({ stationName, stationRank, hadExplicitSelec
             }}
             whileTap={{ scale: 0.98 }}
             transition={{ duration: 0.12 }}
-            style={buttonStyle.secondaryCta}
+            style={{ ...buttonStyle.secondaryCta, flex: 1, width: 'auto' }}
           >
             다시 찾기
+          </motion.button>
+          <motion.button
+            onClick={() => {
+              console.log('Firing event: survey_click');
+              trackEvent('survey_click');
+              setTimeout(() => {
+                window.location.href = 'https://forms.gle/UP6gcmYAwQcdzWkx6';
+              }, 150);
+            }}
+            whileTap={{ scale: 0.98 }}
+            transition={{ duration: 0.12 }}
+            style={{ ...buttonStyle.secondaryCta, flex: 1, width: 'auto' }}
+          >
+            간단 설문 참여하기
           </motion.button>
         </div>
       </div>
