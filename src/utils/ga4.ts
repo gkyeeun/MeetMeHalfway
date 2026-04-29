@@ -15,7 +15,6 @@ type EventName =
   | 'share_click'
   | 'category_click'
   | 'place_retry_click'
-  | 'survey_click'
   | 'start_click';
 
 

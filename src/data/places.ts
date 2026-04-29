@@ -119,4 +119,5 @@ export function getPlacesByStation(station: string, category: string): Place[] {
   return getAllPlacesByStation(station)
     .filter((p) => p.category === category)
     .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
+
 }
