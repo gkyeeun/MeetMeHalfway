@@ -14,8 +14,7 @@ type EventName =
   | 'map_click'
   | 'share_click'
   | 'category_click'
-  | 'place_retry_click'
-  | 'start_click';
+  | 'place_retry_click';
 
 
 interface EventParams {
