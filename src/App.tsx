@@ -215,13 +215,6 @@ export default function App() {
                     </div>
                   ))}
                 </div>
-
-                <p style={{
-                  fontSize: 14, color: '#888', lineHeight: 1.65,
-                  margin: 0, wordBreak: 'keep-all',
-                }}>
-                  이용을 마친 뒤에는 <strong style={{ color: '#555' }}>[간단 설문 참여하기]</strong> 버튼을 눌러 의견을 남겨주세요.
-                </p>
               </motion.div>
             </div>
 
